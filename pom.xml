@@ -141,11 +141,9 @@
                 <version>2.43.0</version>
                 <configuration>
                     <java>
-                        <googleJavaFormat>
-                            <version>1.22.0</version>
-                            <style>GOOGLE</style>
-                            <reflowLongStrings>true</reflowLongStrings>
-                        </googleJavaFormat>
+                        <eclipse>
+                            <version>4.32</version> <!-- Latest eclipse JDT version -->
+                        </eclipse>
                         <removeUnusedImports />
                     </java>
                 </configuration>

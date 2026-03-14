@@ -1,0 +1,37 @@
+erDiagram
+    %% ============================================================
+    %% Module 7: Audit & Notifications
+    %% Stub tables defined fully in 00_full_schema.mermaid
+    %% ============================================================
+
+    %% Stub: cross-module reference
+    users {
+        uuid id PK
+    }
+
+    audit_logs {
+        uuid id PK
+        uuid user_id FK
+        string action "e.g. CREATE, UPDATE, DELETE"
+        string entity_type "e.g. Transaction, Account"
+        uuid entity_id "Referenced entity ID"
+        jsonb changes_json "Before/after diff"
+        string ip_address
+        timestamp created_at "Immutable - no updated_at"
+    }
+
+    notifications {
+        uuid id PK
+        uuid user_id FK
+        string type "BUDGET_ALERT, BILL_REMINDER, LARGE_TRANSACTION, GOAL_MILESTONE, SYSTEM"
+        string title
+        string message
+        string channel "IN_APP, EMAIL, PUSH"
+        boolean is_read
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% Relationships
+    users ||--o{ audit_logs : "generates"
+    users ||--o{ notifications : "receives"

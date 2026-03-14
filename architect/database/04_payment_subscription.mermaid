@@ -1,0 +1,57 @@
+erDiagram
+    %% ============================================================
+    %% Module 4: Payment & Subscription
+    %% Stub tables defined fully in 00_full_schema.mermaid
+    %% ============================================================
+
+    %% Stubs: cross-module references
+    users {
+        uuid id PK
+    }
+
+    categories {
+        uuid id PK
+    }
+
+    accounts {
+        uuid id PK
+    }
+
+    payment_methods {
+        uuid id PK
+        uuid user_id FK
+        string provider "STRIPE, PAYPAL, BANK_TRANSFER, CRYPTO_WALLET, APPLE_PAY, GOOGLE_PAY"
+        string provider_reference_id "External ID / token"
+        string last_four_digits
+        boolean is_default
+        string status "ACTIVE, EXPIRED, REVOKED"
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at "Soft delete"
+    }
+
+    subscriptions {
+        uuid id PK
+        uuid user_id FK
+        uuid category_id FK
+        uuid payment_method_id FK "Nullable"
+        uuid account_id FK "Charged account"
+        string name "e.g. Netflix, Gym, AWS"
+        decimal amount "DECIMAL(19,4)"
+        string currency_code
+        string billing_cycle "WEEKLY, MONTHLY, QUARTERLY, YEARLY"
+        date next_billing_date
+        integer reminder_days_before "Notify N days before billing"
+        string status "ACTIVE, PAUSED, CANCELLED, TRIAL"
+        date trial_end_date
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at "Soft delete"
+    }
+
+    %% Relationships
+    users ||--o{ payment_methods : "configures"
+    users ||--o{ subscriptions : "manages"
+    categories ||--o{ subscriptions : "categorizes"
+    payment_methods ||--o{ subscriptions : "funds"
+    accounts ||--o{ subscriptions : "charged to"

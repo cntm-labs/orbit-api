@@ -1,0 +1,36 @@
+erDiagram
+    %% ============================================================
+    %% Module 6: Integrations (Plaid, Exchange Rates)
+    %% Stub tables defined fully in 00_full_schema.mermaid
+    %% ============================================================
+
+    %% Stub: cross-module reference
+    users {
+        uuid id PK
+    }
+
+    plaid_links {
+        uuid id PK
+        uuid user_id FK
+        string plaid_item_id UK "Plaid Item identifier"
+        string access_token_encrypted "Jasypt encrypted"
+        string institution_name "e.g. Chase, Bank of America"
+        string sync_cursor "Plaid transaction sync cursor"
+        string status "ACTIVE, NEEDS_REAUTH, DISCONNECTED"
+        string error_code "Last Plaid error if any"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    exchange_rates {
+        uuid id PK
+        string base_currency "e.g. USD"
+        string target_currency "e.g. EUR"
+        decimal rate "DECIMAL(19,8)"
+        string source "e.g. ECB, OpenExchangeRates"
+        timestamp fetched_at
+        timestamp created_at
+    }
+
+    %% Relationships
+    users ||--o{ plaid_links : "connects"

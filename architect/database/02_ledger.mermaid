@@ -1,5 +1,10 @@
-```mermaid
 erDiagram
+    %% ============================================================
+    %% Module 2: Ledger & Finance Engine
+    %% Stub tables defined fully in 00_full_schema.mermaid
+    %% ============================================================
+
+    %% Stub: cross-module reference
     users {
         uuid id PK
     }
@@ -7,41 +12,86 @@ erDiagram
     accounts {
         uuid id PK
         uuid user_id FK
-        string name "e.g., Checking, Crypto Wallet"
-        enum type "BANK, CREDIT, CRYPTO, CASH, INVESTMENT"
-        string currency_code "e.g., USD, BTC"
-        decimal current_balance
-        enum status "ACTIVE, INACTIVE, CLOSED"
+        string name "e.g. Checking, Crypto Wallet"
+        string type "BANK, CREDIT, CRYPTO, CASH, INVESTMENT"
+        string currency_code "e.g. USD, BTC"
+        decimal current_balance "DECIMAL(19,4)"
+        string plaid_account_id "Linked Plaid account"
+        string status "ACTIVE, INACTIVE, CLOSED"
         timestamp created_at
         timestamp updated_at
+        timestamp deleted_at "Soft delete"
     }
 
     categories {
         uuid id PK
-        uuid user_id FK "Nullable: if null, it's a system default category"
-        string name "e.g., Groceries, Salary, Rent"
-        enum type "INCOME, EXPENSE, TRANSFER"
+        uuid user_id FK "Nullable: null = system default"
+        uuid parent_category_id FK "Self-ref for subcategories"
+        string name "e.g. Groceries, Salary, Rent"
+        string type "INCOME, EXPENSE, TRANSFER"
         string icon
         string color
+        boolean is_system "true = system default category"
+        timestamp created_at
+        timestamp updated_at
     }
 
     transactions {
         uuid id PK
         uuid account_id FK
-        uuid category_id FK "Nullable for transfers/uncategorized"
-        decimal amount "Negative for expense, positive for income"
+        uuid category_id FK "Nullable for uncategorized"
+        uuid transfer_pair_id FK "Self-ref: links debit+credit pair"
+        uuid recurring_transaction_id FK "Source recurring rule"
+        decimal amount "DECIMAL(19,4) Negative=expense"
         string currency_code "Transaction original currency"
-        decimal exchange_rate "Rate to account's base currency"
+        decimal exchange_rate "DECIMAL(19,8) Rate to account base"
         string description
         timestamp transaction_date
-        enum status "PENDING, COMPLETED, FAILED, CANCELLED"
-        string reference_id "External bank/blockchain reference"
+        string status "PENDING, COMPLETED, FAILED, CANCELLED"
+        string plaid_transaction_id "Synced from Plaid"
+        boolean is_reviewed "User verified this transaction"
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at "Soft delete"
+    }
+
+    tags {
+        uuid id PK
+        uuid user_id FK
+        string name UK "Unique per user"
+        string color
+        timestamp created_at
+    }
+
+    transaction_tags {
+        uuid transaction_id PK "Composite PK"
+        uuid tag_id PK "Composite PK"
+    }
+
+    recurring_transactions {
+        uuid id PK
+        uuid user_id FK
+        uuid account_id FK
+        uuid category_id FK
+        decimal amount "DECIMAL(19,4)"
+        string currency_code
+        string description
+        string frequency "DAILY, WEEKLY, BIWEEKLY, MONTHLY, QUARTERLY, YEARLY"
+        date next_occurrence
+        boolean auto_confirm "Auto-complete generated transactions"
+        string status "ACTIVE, PAUSED, CANCELLED"
         timestamp created_at
         timestamp updated_at
     }
 
+    %% Relationships
     users ||--o{ accounts : "owns"
     users ||--o{ categories : "creates custom"
+    users ||--o{ tags : "defines"
+    users ||--o{ recurring_transactions : "schedules"
     accounts ||--o{ transactions : "contains"
     categories ||--o{ transactions : "categorizes"
-```
+    categories ||--o| categories : "has subcategories"
+    transactions ||--o{ transaction_tags : "tagged with"
+    tags ||--o{ transaction_tags : "applied to"
+    recurring_transactions ||--o{ transactions : "generates"

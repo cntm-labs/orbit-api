@@ -1,0 +1,33 @@
+erDiagram
+    %% ============================================================
+    %% Module 5: Crypto
+    %% Stub tables defined fully in 00_full_schema.mermaid
+    %% ============================================================
+
+    %% Stub: cross-module reference
+    users {
+        uuid id PK
+    }
+
+    crypto_assets {
+        uuid id PK
+        string symbol UK "e.g. BTC, ETH"
+        string name "e.g. Bitcoin, Ethereum"
+        string coingecko_id UK "CoinGecko API identifier"
+        decimal current_price_usd "DECIMAL(19,8)"
+        integer market_cap_rank
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    crypto_portfolio_snapshots {
+        uuid id PK
+        uuid user_id FK
+        date snapshot_date
+        decimal total_value_usd "DECIMAL(19,4)"
+        jsonb holdings_json "Array of coin/amount/value"
+        timestamp created_at
+    }
+
+    %% Relationships
+    users ||--o{ crypto_portfolio_snapshots : "tracks"

@@ -1,82 +1,337 @@
-```mermaid
 erDiagram
-    %% ==========================================
-    %% USER & AUTH (Clerk Integration)
-    %% ==========================================
+    %% ============================================================
+    %% Orbit PFM — Full Database Schema (Single Source of Truth)
+    %% 21 tables · Production-grade · Last updated 2026-03-15
+    %% ============================================================
+
+    %% ----------------------------------------------------------
+    %% MODULE 1: USER & AUTH (Clerk Integration)
+    %% ----------------------------------------------------------
     users {
         uuid id PK
-        string clerk_user_id UK
+        string clerk_user_id UK "Unique ID from Clerk Auth"
         string email UK
         string first_name
         string last_name
-        string base_currency
+        string base_currency "e.g. USD, EUR, THB"
+        string timezone "e.g. Asia/Bangkok"
+        string status "ACTIVE, SUSPENDED, DEACTIVATED"
         timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at "Soft delete"
     }
 
-    %% ==========================================
-    %% LEDGER & FINANCE ENGINE
-    %% ==========================================
+    user_addresses {
+        uuid id PK
+        uuid user_id FK
+        string label "e.g. Home, Work, Billing"
+        string address_line1
+        string address_line2
+        string city
+        string state
+        string postal_code
+        string country_code "ISO 3166-1 alpha-2"
+        boolean is_default
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    user_preferences {
+        uuid id PK
+        uuid user_id FK "One-to-one, unique"
+        boolean dark_mode
+        string language "e.g. en, th"
+        string date_format "e.g. DD/MM/YYYY"
+        string number_format "e.g. 1,234.56"
+        boolean biometric_enabled "Fingerprint / Face ID"
+        boolean lab_3d_charts "Orbit Lab: 3D Charts"
+        boolean lab_ai_suggest "Orbit Lab: AI Suggest"
+        boolean lab_smart_alert "Orbit Lab: Smart Alert"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    notification_preferences {
+        uuid id PK
+        uuid user_id FK "One-to-one, unique"
+        boolean email_enabled
+        boolean push_enabled
+        boolean budget_alerts
+        boolean bill_reminders
+        decimal large_transaction_threshold "DECIMAL(19,4)"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ----------------------------------------------------------
+    %% MODULE 2: LEDGER & FINANCE ENGINE
+    %% ----------------------------------------------------------
     accounts {
         uuid id PK
         uuid user_id FK
-        string name
-        enum type "BANK, CREDIT, CRYPTO, CASH"
-        string currency_code
-        decimal current_balance
-        enum status
+        string name "e.g. Checking, Crypto Wallet"
+        string type "BANK, CREDIT, CRYPTO, CASH, INVESTMENT"
+        string currency_code "e.g. USD, BTC"
+        decimal current_balance "DECIMAL(19,4)"
+        string plaid_account_id "Linked Plaid account"
+        string status "ACTIVE, INACTIVE, CLOSED"
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at "Soft delete"
     }
 
     categories {
         uuid id PK
-        uuid user_id FK
-        string name
-        enum type "INCOME, EXPENSE, TRANSFER"
+        uuid user_id FK "Nullable: null = system default"
+        uuid parent_category_id FK "Self-ref for subcategories"
+        string name "e.g. Groceries, Salary, Rent"
+        string type "INCOME, EXPENSE, TRANSFER"
+        string icon
+        string color
+        boolean is_system "true = system default category"
+        timestamp created_at
+        timestamp updated_at
     }
 
     transactions {
         uuid id PK
         uuid account_id FK
-        uuid category_id FK
-        decimal amount
-        string currency_code
+        uuid category_id FK "Nullable for uncategorized"
+        uuid transfer_pair_id FK "Self-ref: links debit+credit pair"
+        uuid recurring_transaction_id FK "Source recurring rule"
+        decimal amount "DECIMAL(19,4) Negative=expense"
+        string currency_code "Transaction original currency"
+        decimal exchange_rate "DECIMAL(19,8) Rate to account base"
         string description
         timestamp transaction_date
-        enum status
+        string status "PENDING, COMPLETED, FAILED, CANCELLED"
+        string plaid_transaction_id "Synced from Plaid"
+        boolean is_reviewed "User verified this transaction"
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at "Soft delete"
     }
 
-    %% ==========================================
-    %% PAYMENTS & SUBSCRIPTIONS
-    %% ==========================================
+    tags {
+        uuid id PK
+        uuid user_id FK
+        string name UK "Unique per user"
+        string color
+        timestamp created_at
+    }
+
+    transaction_tags {
+        uuid transaction_id PK "Composite PK"
+        uuid tag_id PK "Composite PK"
+    }
+
+    recurring_transactions {
+        uuid id PK
+        uuid user_id FK
+        uuid account_id FK
+        uuid category_id FK
+        decimal amount "DECIMAL(19,4)"
+        string currency_code
+        string description
+        string frequency "DAILY, WEEKLY, BIWEEKLY, MONTHLY, QUARTERLY, YEARLY"
+        date next_occurrence
+        boolean auto_confirm "Auto-complete generated transactions"
+        string status "ACTIVE, PAUSED, CANCELLED"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ----------------------------------------------------------
+    %% MODULE 3: BUDGET & GOALS
+    %% ----------------------------------------------------------
+    budgets {
+        uuid id PK
+        uuid user_id FK
+        string name
+        string period_type "MONTHLY, QUARTERLY, YEARLY, CUSTOM"
+        date start_date
+        date end_date
+        decimal total_amount "DECIMAL(19,4)"
+        string status "ACTIVE, ARCHIVED"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    budget_items {
+        uuid id PK
+        uuid budget_id FK
+        uuid category_id FK
+        decimal allocated_amount "DECIMAL(19,4)"
+        decimal spent_amount "DECIMAL(19,4) Denormalized"
+        integer alert_threshold_pct "e.g. 80 = alert at 80%"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    goals {
+        uuid id PK
+        uuid user_id FK
+        string name
+        decimal target_amount "DECIMAL(19,4)"
+        decimal current_amount "DECIMAL(19,4)"
+        date target_date
+        uuid linked_account_id FK "Optional savings account"
+        string status "IN_PROGRESS, ACHIEVED, CANCELLED"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ----------------------------------------------------------
+    %% MODULE 4: PAYMENT & SUBSCRIPTION
+    %% ----------------------------------------------------------
     payment_methods {
         uuid id PK
         uuid user_id FK
-        enum provider
-        string provider_reference_id
+        string provider "STRIPE, PAYPAL, BANK_TRANSFER, CRYPTO_WALLET, APPLE_PAY, GOOGLE_PAY"
+        string provider_reference_id "External ID / token"
+        string last_four_digits
         boolean is_default
+        string status "ACTIVE, EXPIRED, REVOKED"
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at "Soft delete"
     }
 
     subscriptions {
         uuid id PK
         uuid user_id FK
         uuid category_id FK
-        uuid payment_method_id FK
-        string name
-        decimal amount
+        uuid payment_method_id FK "Nullable"
+        uuid account_id FK "Charged account"
+        string name "e.g. Netflix, Gym, AWS"
+        decimal amount "DECIMAL(19,4)"
         string currency_code
-        enum billing_cycle
-        timestamp next_billing_date
-        enum status
+        string billing_cycle "WEEKLY, MONTHLY, QUARTERLY, YEARLY"
+        date next_billing_date
+        integer reminder_days_before "Notify N days before billing"
+        string status "ACTIVE, PAUSED, CANCELLED, TRIAL"
+        date trial_end_date
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at "Soft delete"
     }
 
-    %% Relationships
+    %% ----------------------------------------------------------
+    %% MODULE 5: CRYPTO
+    %% ----------------------------------------------------------
+    crypto_assets {
+        uuid id PK
+        string symbol UK "e.g. BTC, ETH"
+        string name "e.g. Bitcoin, Ethereum"
+        string coingecko_id UK "CoinGecko API identifier"
+        decimal current_price_usd "DECIMAL(19,8)"
+        integer market_cap_rank
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    crypto_portfolio_snapshots {
+        uuid id PK
+        uuid user_id FK
+        date snapshot_date
+        decimal total_value_usd "DECIMAL(19,4)"
+        jsonb holdings_json "Array of coin/amount/value"
+        timestamp created_at
+    }
+
+    %% ----------------------------------------------------------
+    %% MODULE 6: INTEGRATIONS
+    %% ----------------------------------------------------------
+    plaid_links {
+        uuid id PK
+        uuid user_id FK
+        string plaid_item_id UK "Plaid Item identifier"
+        string access_token_encrypted "Jasypt encrypted"
+        string institution_name "e.g. Chase, Bank of America"
+        string sync_cursor "Plaid transaction sync cursor"
+        string status "ACTIVE, NEEDS_REAUTH, DISCONNECTED"
+        string error_code "Last Plaid error if any"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    exchange_rates {
+        uuid id PK
+        string base_currency "e.g. USD"
+        string target_currency "e.g. EUR"
+        decimal rate "DECIMAL(19,8)"
+        string source "e.g. ECB, OpenExchangeRates"
+        timestamp fetched_at
+        timestamp created_at
+    }
+
+    %% ----------------------------------------------------------
+    %% MODULE 7: AUDIT & NOTIFICATIONS
+    %% ----------------------------------------------------------
+    audit_logs {
+        uuid id PK
+        uuid user_id FK
+        string action "e.g. CREATE, UPDATE, DELETE"
+        string entity_type "e.g. Transaction, Account"
+        uuid entity_id "Referenced entity ID"
+        jsonb changes_json "Before/after diff"
+        string ip_address
+        timestamp created_at "Immutable - no updated_at"
+    }
+
+    notifications {
+        uuid id PK
+        uuid user_id FK
+        string type "BUDGET_ALERT, BILL_REMINDER, LARGE_TRANSACTION, GOAL_MILESTONE, SYSTEM"
+        string title
+        string message
+        string channel "IN_APP, EMAIL, PUSH"
+        boolean is_read
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ============================================================
+    %% RELATIONSHIPS
+    %% ============================================================
+
+    %% User & Auth
+    users ||--o{ user_addresses : "has"
+    users ||--o| user_preferences : "has"
+    users ||--o| notification_preferences : "has"
+
+    %% Ledger
     users ||--o{ accounts : "owns"
-    users ||--o{ categories : "has custom"
-    users ||--o{ payment_methods : "configures"
-    users ||--o{ subscriptions : "manages"
-    
+    users ||--o{ categories : "creates custom"
+    users ||--o{ tags : "defines"
+    users ||--o{ recurring_transactions : "schedules"
     accounts ||--o{ transactions : "contains"
     categories ||--o{ transactions : "categorizes"
-    
+    categories ||--o| categories : "has subcategories"
+    transactions ||--o{ transaction_tags : "tagged with"
+    tags ||--o{ transaction_tags : "applied to"
+    recurring_transactions ||--o{ transactions : "generates"
+
+    %% Budget & Goals
+    users ||--o{ budgets : "plans"
+    budgets ||--o{ budget_items : "allocates"
+    categories ||--o{ budget_items : "tracked in"
+    users ||--o{ goals : "sets"
+    accounts ||--o| goals : "linked to"
+
+    %% Payment & Subscription
+    users ||--o{ payment_methods : "configures"
+    users ||--o{ subscriptions : "manages"
     categories ||--o{ subscriptions : "categorizes"
     payment_methods ||--o{ subscriptions : "funds"
-```
+    accounts ||--o{ subscriptions : "charged to"
+
+    %% Crypto
+    users ||--o{ crypto_portfolio_snapshots : "tracks"
+
+    %% Integrations
+    users ||--o{ plaid_links : "connects"
+
+    %% Audit & Notifications
+    users ||--o{ audit_logs : "generates"
+    users ||--o{ notifications : "receives"

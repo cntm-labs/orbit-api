@@ -1,0 +1,62 @@
+erDiagram
+    %% ============================================================
+    %% Module 3: Budget & Goals
+    %% Stub tables defined fully in 00_full_schema.mermaid
+    %% ============================================================
+
+    %% Stubs: cross-module references
+    users {
+        uuid id PK
+    }
+
+    categories {
+        uuid id PK
+    }
+
+    accounts {
+        uuid id PK
+    }
+
+    budgets {
+        uuid id PK
+        uuid user_id FK
+        string name
+        string period_type "MONTHLY, QUARTERLY, YEARLY, CUSTOM"
+        date start_date
+        date end_date
+        decimal total_amount "DECIMAL(19,4)"
+        string status "ACTIVE, ARCHIVED"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    budget_items {
+        uuid id PK
+        uuid budget_id FK
+        uuid category_id FK
+        decimal allocated_amount "DECIMAL(19,4)"
+        decimal spent_amount "DECIMAL(19,4) Denormalized"
+        integer alert_threshold_pct "e.g. 80 = alert at 80%"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    goals {
+        uuid id PK
+        uuid user_id FK
+        string name
+        decimal target_amount "DECIMAL(19,4)"
+        decimal current_amount "DECIMAL(19,4)"
+        date target_date
+        uuid linked_account_id FK "Optional savings account"
+        string status "IN_PROGRESS, ACHIEVED, CANCELLED"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% Relationships
+    users ||--o{ budgets : "plans"
+    budgets ||--o{ budget_items : "allocates"
+    categories ||--o{ budget_items : "tracked in"
+    users ||--o{ goals : "sets"
+    accounts ||--o| goals : "linked to"

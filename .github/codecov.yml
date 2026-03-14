@@ -1,0 +1,31 @@
+coverage:
+  status:
+    project:
+      default:
+        # Require the overall project coverage to be at least 80%
+        target: 80%
+        # Allow the coverage to drop by a maximum of 2% in a single PR before failing
+        threshold: 2%
+    patch:
+      default:
+        # Require the newly added/modified code in a PR to have at least 80% coverage
+        target: 80%
+
+# Do not track coverage for these specific directories/files
+ignore:
+  - "docs/**/*"
+  - "architect/**/*"
+  - "design/**/*"
+  - "scripts/**/*"
+  - "src/test/**/*" # Exclude the test files themselves from coverage calculations
+  - "src/main/java/**/OrbitApplication.java" # Usually hard to test the main bootstrap class
+  - "src/main/java/**/config/**/*" # Exclude configuration files
+  - "src/main/java/**/exception/**/*" # Exclude custom exception boilerplate
+  - "src/main/java/**/entity/**/*" # Exclude JPA Entities (just getters/setters/annotations)
+  - "src/main/java/**/api/request/**/*" # Exclude simple DTO records
+  - "src/main/java/**/api/response/**/*" # Exclude simple DTO records
+
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: false  # if true: only post the comment if coverage changes

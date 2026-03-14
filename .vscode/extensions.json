@@ -1,0 +1,17 @@
+{
+  "recommendations": [
+    "vscjava.vscode-java-pack",
+    "vscjava.vscode-spring-boot-dashboard",
+    "vscjava.vscode-spring-initializr",
+    "vmware.vscode-boot-dev-pack",
+    "vmware.vscode-spring-boot",
+    "GabrielBB.vscode-lombok",
+    "SonarSource.sonarlint-vscode",
+    "Pivotal.vscode-spring-boot",
+    "EditorConfig.EditorConfig",
+    "esbenp.prettier-vscode",
+    "eamodio.tsl-problem-matcher",
+    "redhat.vscode-xml",
+    "vscjava.vscode-java-dependency"
+  ]
+}

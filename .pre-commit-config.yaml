@@ -1,0 +1,45 @@
+# Top-tier pre-commit configuration for a Java/Spring Boot project
+# To use this, you need to install the `pre-commit` tool (e.g., `brew install pre-commit` or `pip install pre-commit`)
+# Then run `pre-commit install` in the root of this repository.
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # Git style checks
+      - id: check-added-large-files
+        args: ['--maxkb=5000']
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      
+      # Formatting and Cleanliness
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+      
+      # Security & Secrets
+      - id: detect-private-key
+
+  # Prevent committing directly to the main/master branch
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: no-commit-to-branch
+        args: ['--branch', 'main', '--branch', 'master']
+
+  # Ensure XML and YAML configurations are well-formed
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-yaml
+      - id: check-xml
+      - id: check-json
+
+  # Advanced: Commit message format enforcement (Conventional Commits)
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.1.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: []

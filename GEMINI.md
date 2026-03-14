@@ -72,3 +72,17 @@ Run a specific test method:
 *   **Dependency Injection:** Prefer constructor-based dependency injection (often facilitated by Lombok's `@RequiredArgsConstructor`).
 *   **Configuration:** Externalize configuration to `application.properties` (or `application.yml` if migrated).
 *   **Testing:** Write corresponding tests in `src/test/java` for new features or bug fixes using the Spring Boot testing slice annotations (like `@DataJpaTest`, `@WebMvcTest`, etc.) or `@SpringBootTest` for integration tests.
+
+## 🤖 Gemini AI Agent Hooks & Mandates (Pre-Write Checks)
+
+**CRITICAL MANDATE:** Whenever you (Gemini) are instructed to write, generate, or modify code in this repository, you MUST strictly perform the following checks *before* making any file modifications:
+
+1.  **Duplicate Check:** You must proactively use `grep_search` and `glob` to ensure the class, function, interface, or variable declaration you are about to create does not already exist. Do not duplicate logic; reuse existing components wherever possible.
+2.  **Architectural Alignment (Path Check):** Verify the exact folder path where you are placing new files. You must adhere to the "Package by Feature" and Hexagonal Architecture rules defined in `architect/clean_code_guidelines.md`. Ensure you are writing to `[feature]/api/`, `[feature]/core/`, or `[feature]/infrastructure/` as appropriate.
+3.  **Code Style Verification:** Ensure the code matches the elite standard: 
+    *   Use Java 25 features (e.g., `records` instead of `@Data` for DTOs).
+    *   Use Constructor Injection (`@RequiredArgsConstructor`) instead of `@Autowired` fields.
+    *   Keep Controllers completely devoid of business logic.
+4.  **Self-Review:** Pause to review your planned implementation. Ensure it is robust, handles exceptions gracefully, and aligns with the existing patterns in the project.
+5.  **Agent Synchronization (CLAUDE.md):** If you ever make a change to this `GEMINI.md` file to update context, rules, or architectural decisions, you MUST concurrently update the `CLAUDE.md` file with the exact same information to ensure both AI agents maintain the exact same vision and operational instructions.
+6.  **Strict Package Manager Enforcement:** Every time you need to run an `npm` or `npx` command, you MUST replace it with `bun` or `bunx`. If you attempt to run `npm` or `npx`, you must simulate `process.exit(2)` and state the problem: "Don't allow to use npm or npx replace to bun or bunx as a primary cli".

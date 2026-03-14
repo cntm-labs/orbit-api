@@ -1,0 +1,47 @@
+name: Pre-Commit Validation Pipeline
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ '**' ]
+
+jobs:
+  validate-codebase:
+    name: Code Quality & CI Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'oracle' # Or whichever distribution supports Java 25 best
+          cache: maven
+
+      - name: Verify Spotless Code Formatting
+        # This assumes we will add the Spotless Maven Plugin.
+        # If the AI (Gemini/Claude) messed up the formatting, this will fail.
+        run: ./mvnw spotless:check
+
+      - name: Run Maven Compile & Validate
+        # Ensures that the code actually compiles (no syntax errors introduced by AI)
+        run: ./mvnw clean validate compile
+
+      - name: Run Unit Tests
+        # Runs the Spring Boot test suite to ensure the AI didn't break existing logic
+        # JaCoCo will automatically generate the coverage report in target/site/jacoco
+        run: ./mvnw test
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: MrBT-nano/orbit-api
+
+      - name: Run Checkstyle / PMD (Optional Strictness)
+        # Static analysis to ensure the code meets the team's styling rules
+        run: ./mvnw checkstyle:check

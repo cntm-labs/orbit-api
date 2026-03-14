@@ -1,0 +1,47 @@
+```mermaid
+erDiagram
+    users {
+        uuid id PK
+    }
+
+    accounts {
+        uuid id PK
+        uuid user_id FK
+        string name "e.g., Checking, Crypto Wallet"
+        enum type "BANK, CREDIT, CRYPTO, CASH, INVESTMENT"
+        string currency_code "e.g., USD, BTC"
+        decimal current_balance
+        enum status "ACTIVE, INACTIVE, CLOSED"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    categories {
+        uuid id PK
+        uuid user_id FK "Nullable: if null, it's a system default category"
+        string name "e.g., Groceries, Salary, Rent"
+        enum type "INCOME, EXPENSE, TRANSFER"
+        string icon
+        string color
+    }
+
+    transactions {
+        uuid id PK
+        uuid account_id FK
+        uuid category_id FK "Nullable for transfers/uncategorized"
+        decimal amount "Negative for expense, positive for income"
+        string currency_code "Transaction original currency"
+        decimal exchange_rate "Rate to account's base currency"
+        string description
+        timestamp transaction_date
+        enum status "PENDING, COMPLETED, FAILED, CANCELLED"
+        string reference_id "External bank/blockchain reference"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    users ||--o{ accounts : "owns"
+    users ||--o{ categories : "creates custom"
+    accounts ||--o{ transactions : "contains"
+    categories ||--o{ transactions : "categorizes"
+```

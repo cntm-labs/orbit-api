@@ -1,0 +1,24 @@
+```mermaid
+erDiagram
+    %% Core User Identity integrated with Clerk Auth
+    users {
+        uuid id PK "Internal system ID"
+        string clerk_user_id UK "Unique ID from Clerk Auth"
+        string email UK
+        string first_name
+        string last_name
+        string base_currency "e.g., USD, EUR"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    user_preferences {
+        uuid id PK
+        uuid user_id FK
+        boolean dark_mode
+        string language
+        timestamp updated_at
+    }
+
+    users ||--o| user_preferences : "has"
+```

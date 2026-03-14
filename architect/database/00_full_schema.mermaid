@@ -1,0 +1,82 @@
+```mermaid
+erDiagram
+    %% ==========================================
+    %% USER & AUTH (Clerk Integration)
+    %% ==========================================
+    users {
+        uuid id PK
+        string clerk_user_id UK
+        string email UK
+        string first_name
+        string last_name
+        string base_currency
+        timestamp created_at
+    }
+
+    %% ==========================================
+    %% LEDGER & FINANCE ENGINE
+    %% ==========================================
+    accounts {
+        uuid id PK
+        uuid user_id FK
+        string name
+        enum type "BANK, CREDIT, CRYPTO, CASH"
+        string currency_code
+        decimal current_balance
+        enum status
+    }
+
+    categories {
+        uuid id PK
+        uuid user_id FK
+        string name
+        enum type "INCOME, EXPENSE, TRANSFER"
+    }
+
+    transactions {
+        uuid id PK
+        uuid account_id FK
+        uuid category_id FK
+        decimal amount
+        string currency_code
+        string description
+        timestamp transaction_date
+        enum status
+    }
+
+    %% ==========================================
+    %% PAYMENTS & SUBSCRIPTIONS
+    %% ==========================================
+    payment_methods {
+        uuid id PK
+        uuid user_id FK
+        enum provider
+        string provider_reference_id
+        boolean is_default
+    }
+
+    subscriptions {
+        uuid id PK
+        uuid user_id FK
+        uuid category_id FK
+        uuid payment_method_id FK
+        string name
+        decimal amount
+        string currency_code
+        enum billing_cycle
+        timestamp next_billing_date
+        enum status
+    }
+
+    %% Relationships
+    users ||--o{ accounts : "owns"
+    users ||--o{ categories : "has custom"
+    users ||--o{ payment_methods : "configures"
+    users ||--o{ subscriptions : "manages"
+    
+    accounts ||--o{ transactions : "contains"
+    categories ||--o{ transactions : "categorizes"
+    
+    categories ||--o{ subscriptions : "categorizes"
+    payment_methods ||--o{ subscriptions : "funds"
+```

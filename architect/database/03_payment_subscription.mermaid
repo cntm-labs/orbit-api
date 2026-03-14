@@ -1,0 +1,36 @@
+```mermaid
+erDiagram
+    users {
+        uuid id PK
+    }
+
+    payment_methods {
+        uuid id PK
+        uuid user_id FK
+        enum provider "STRIPE, PAYPAL, BANK_TRANSFER, CRYPTO_WALLET"
+        string provider_reference_id "External ID token"
+        boolean is_default
+        string last_four_digits
+        enum status "ACTIVE, EXPIRED, REVOKED"
+        timestamp created_at
+    }
+
+    subscriptions {
+        uuid id PK
+        uuid user_id FK
+        uuid category_id FK
+        uuid payment_method_id FK "Nullable: How this is paid"
+        string name "e.g., Netflix, Gym, AWS"
+        decimal amount
+        string currency_code
+        enum billing_cycle "WEEKLY, MONTHLY, YEARLY"
+        timestamp next_billing_date
+        enum status "ACTIVE, PAUSED, CANCELLED"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    users ||--o{ payment_methods : "configures"
+    users ||--o{ subscriptions : "manages"
+    payment_methods ||--o{ subscriptions : "funds"
+```

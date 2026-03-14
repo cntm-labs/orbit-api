@@ -42,6 +42,3 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: MrBT-nano/orbit-api
 
-      - name: Run Checkstyle / PMD (Optional Strictness)
-        # Static analysis to ensure the code meets the team's styling rules
-        run: ./mvnw checkstyle:check

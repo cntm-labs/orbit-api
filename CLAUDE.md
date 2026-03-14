@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build & Run Commands
 
 ```bash
-# Build the project
+# Build the project (includes Spotless format check at compile phase)
 ./mvnw clean install
 
 # Run the application (starts PostgreSQL via Docker Compose automatically)
@@ -22,52 +22,74 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 # Package without running tests
 ./mvnw package -DskipTests
+
+# Fix code formatting (Eclipse JDT 4.32 formatter)
+./mvnw spotless:apply
+
+# Check formatting without fixing
+./mvnw spotless:check
+
+# Generate test coverage report (output: target/site/jacoco/)
+./mvnw jacoco:report
+
+# Verify API documentation coverage (requires running app + openapi.json generated)
+./scripts/verify-docs.sh
 ```
 
 ## Architecture & Tech Stack
 
-This is a Spring Boot 4.0.1 web application using Java 25. Based on the configuration, it appears to be a RESTful service with a PostgreSQL database, likely handling financial data (indicated by the `finance` database name).
+Orbit is a **Personal Finance Management System** — a Spring Boot 4.0.3 / Java 25 RESTful API for managing financial ledgers, multi-currency assets (including crypto), and payments.
 
-**Tech Stack:**
-- Spring Web MVC for REST endpoints
-- Spring Data JPA with PostgreSQL database
-- Spring Security for authentication/authorization
-- Spring Validation for input validation
+**Key Dependencies:**
+- Spring Web MVC + springdoc-openapi (Swagger UI at `/swagger-ui.html`)
+- Spring Data JPA with PostgreSQL (prod) / H2 (test)
+- Spring Security, Spring Validation, Spring Actuator
 - Lombok for boilerplate reduction
-- Docker Compose for local PostgreSQL (auto-started by Spring Boot DevTools)
-- Maven (using the Maven Wrapper `mvnw`)
+- Docker Compose for local PostgreSQL (auto-managed by `spring-boot-docker-compose`)
+- Spotless (Eclipse JDT 4.32) for formatting, JaCoCo for coverage
 
-**Project Structure:**
-The codebase follows a standard Spring Boot maven layout but utilizes a "Package by Feature" Hexagonal Architecture:
-- `src/main/java/com/mrbt/orbit/`: Root package.
-  - Sub-packages include: `audit`, `common`, `config`, `crypto`, `ledger`, `payment`, `security`.
-- Inside feature packages (e.g., `ledger`), follow this structure:
-  - `api/`: Inbound boundaries (REST Controllers, DTOs for request/response).
-  - `core/`: Business logic (Services, Domain Models, Ports).
-  - `infrastructure/`: Outbound boundaries (JPA Entities, Repositories, Mappers).
+**Hexagonal "Package by Feature" Architecture:**
+
+Each feature module under `src/main/java/com/mrbt/orbit/` follows this structure:
+```
+[feature]/
+├── api/              # Inbound: REST Controllers, request/response DTOs
+├── core/             # Business logic: Services, Domain Models, Ports (interfaces)
+├── infrastructure/   # Outbound: JPA Entities, Repositories, Mappers
+└── exception/        # Module-specific exceptions
+```
+Feature packages: `audit`, `common`, `config`, `crypto`, `ledger`, `payment`, `security`.
+
+Cross-cutting concerns live in `common/` and `config/`.
 
 **Database:**
-- PostgreSQL runs via Docker Compose (`compose.yaml`)
-- Database: `finance`, User: `mrbt`, Password: `secret`
-- Spring Boot Docker Compose support auto-manages the container lifecycle during development
+- PostgreSQL via Docker Compose (`compose.yaml`) — DB: `finance`, User: `mrbt`, Password: `secret`, Port: `5432`
+- Spring Boot Docker Compose support auto-manages the container lifecycle
+- Tests use H2 in-memory database (no Docker needed for tests)
 
 ## Development Conventions
 
-*   **Lombok:** Use Lombok annotations to minimize boilerplate code, BUT prefer Java 25 `records` for DTOs and immutable data carriers.
-*   **Dependency Injection:** Use constructor-based dependency injection (facilitated by Lombok's `@RequiredArgsConstructor`). NEVER use `@Autowired` on fields.
-*   **Controllers:** Controllers must contain NO business logic. They only receive requests, call a service, and return a response.
-*   **Configuration:** Externalize configuration to `application.properties`.
-*   **Formatting:** The project uses Spotless Maven Plugin to enforce the Google Java Style Guide. Run `./mvnw spotless:apply` if needed.
+- **Records for DTOs:** Use Java `record` for all DTOs and immutable data carriers. Never use `@Data` for DTOs.
+- **Constructor Injection:** Use `@RequiredArgsConstructor` + `private final` fields. NEVER use `@Autowired` on fields.
+- **Thin Controllers:** Controllers do exactly 3 things: receive request, call service, return response. No `if/else` business logic.
+- **CQRS at scale:** If a service exceeds ~300 lines, split into focused use-case classes (e.g., `CreateTransactionUseCase`, `CalculateBalanceQuery`).
+- **Formatting:** Spotless runs at the `compile` phase — builds will fail on format violations. Run `./mvnw spotless:apply` to fix.
+- **API Documentation:** All endpoints must have springdoc/OpenAPI annotations. CI runs `scripts/verify-docs.sh` to enforce this.
+- **Package Manager:** Use `bun`/`bunx` instead of `npm`/`npx` for anything in the `docs/` Next.js app.
 
-## 🤖 AI Agent Hooks & Mandates (Pre-Write Checks)
+## CI/CD
 
-**CRITICAL MANDATE:** Whenever you (Claude) are instructed to write, generate, or modify code in this repository, you MUST strictly perform the following checks *before* making any file modifications:
+- **Spotless:** Format check on every build
+- **JaCoCo + Codecov:** Coverage must not drop below 80%
+- **GitHub CodeQL:** Security vulnerability scanning
+- **Documentation Verification:** `scripts/verify-docs.sh` ensures no endpoint is merged undocumented
+- **Dependabot:** Weekly automated dependency updates
 
-1.  **Duplicate Check:** Proactively check to ensure the class, function, interface, or variable declaration you are about to create does not already exist. Do not duplicate logic.
-2.  **Architectural Alignment (Path Check):** Verify the exact folder path. Adhere to the "Package by Feature" rules defined in `architect/clean_code_guidelines.md` (e.g., write to `[feature]/api/`, `[feature]/core/`, or `[feature]/infrastructure/`).
-3.  **Code Style Verification:** 
-    *   Use Java 25 features (`records`).
-    *   Use Constructor Injection (`@RequiredArgsConstructor`).
-4.  **Self-Review:** Ensure your implementation is robust and aligns with existing patterns.
-5.  **Agent Synchronization (GEMINI.md):** If you ever make a change to this `CLAUDE.md` file to update context, rules, or architectural decisions, you MUST concurrently update the `GEMINI.md` file with the exact same information to ensure both AI agents maintain the exact same vision and operational instructions.
-6.  **Strict Package Manager Enforcement:** Every time you need to run an `npm` or `npx` command, you MUST replace it with `bun` or `bunx`. If you attempt to run `npm` or `npx`, you must simulate `process.exit(2)` and state the problem: "Don't allow to use npm or npx replace to bun or bunx as a primary cli".
+## AI Agent Hooks (Pre-Write Checks)
+
+Before creating or modifying code, you MUST:
+
+1. **Duplicate Check:** Search to ensure the class/function/interface doesn't already exist.
+2. **Path Check:** Place files in the correct hexagonal layer (`api/`, `core/`, `infrastructure/`).
+3. **Style Check:** Use Java 25 records for DTOs, constructor injection, thin controllers.
+4. **GEMINI.md is Primary:** `GEMINI.md` is the source of truth for all architectural decisions, rules, and conventions. If you update this `CLAUDE.md` file, ensure it stays in sync with `GEMINI.md`. If there is a conflict, `GEMINI.md` takes precedence.

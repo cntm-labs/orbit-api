@@ -2,18 +2,111 @@
 @plugin "daisyui";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Default to Light Mode values from Design System */
+  --background: #F8F5FF;
+  --foreground: #1A1528;
+  --primary: #6C3AE0;
+  --secondary: #E8457A;
+  --accent: #E8913A;
+  --neutral: #EEEBF5;
+  --base-100: #FFFFFF;
+  --base-200: #F8F5FF;
+  --base-300: #EEEBF5;
+  --info: #9B6FE8;
+  --success: #5DFDCB; /* Keeping the cyan from dark mode as success */
+  --warning: #E8913A;
+  --error: #E8457A;
+  --muted: #6B5F82;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark Mode values from Design System */
+    --background: #0D0B1A;
+    --foreground: #F0EDF5;
+    --primary: #5DFDCB;
+    --secondary: #B07AFF;
+    --accent: #FFB07A;
+    --neutral: #2A1F3D;
+    --base-100: #1A1528;
+    --base-200: #0D0B1A;
+    --base-300: #2A1F3D;
+    --info: #B07AFF;
+    --success: #5DFDCB;
+    --warning: #FFB07A;
+    --error: #FF6B9D;
+    --muted: #9B8FB8;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-neutral: var(--neutral);
+  --color-base-100: var(--base-100);
+  --color-base-200: var(--base-200);
+  --color-base-300: var(--base-300);
+  --color-info: var(--info);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-muted: var(--muted);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
+}
+
+/* Custom styles for Swagger UI to match our theme */
+.swagger-ui {
+  color: var(--foreground) !important;
+}
+.swagger-ui .info .title,
+.swagger-ui .info .base-url,
+.swagger-ui .opblock .opblock-summary-operation-id,
+.swagger-ui .opblock .opblock-summary-path,
+.swagger-ui .opblock .opblock-summary-path__deprecated {
+  color: var(--foreground) !important;
+}
+.swagger-ui .opblock-tag {
+  color: var(--primary) !important;
+  border-bottom-color: var(--neutral) !important;
+}
+.swagger-ui section.models .model-container, 
+.swagger-ui .scheme-container,
+.swagger-ui .opblock .opblock-section-header {
+  background: var(--base-200) !important;
+  border-color: var(--neutral) !important;
+}
+.swagger-ui select {
+  background: var(--base-100) !important;
+  color: var(--foreground) !important;
+  border-color: var(--neutral) !important;
+}
+.swagger-ui .topbar {
+  display: none !important;
+}
+.swagger-ui .model-title, 
+.swagger-ui .model-box, 
+.swagger-ui .model {
+  color: var(--foreground) !important;
+}
+.swagger-ui .prop-type, 
+.swagger-ui .prop-format {
+  color: var(--info) !important;
+}
+.swagger-ui table thead tr td, 
+.swagger-ui table thead tr th {
+  color: var(--muted) !important;
+}
+.swagger-ui .parameter__name, 
+.swagger-ui .parameter__type {
+  color: var(--foreground) !important;
 }

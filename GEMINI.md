@@ -78,7 +78,7 @@ Run a specific test method:
 **CRITICAL MANDATE:** Whenever you (Gemini) are instructed to write, generate, or modify code in this repository, you MUST strictly perform the following checks *before* making any file modifications:
 
 1.  **Duplicate Check:** You must proactively use `grep_search` and `glob` to ensure the class, function, interface, or variable declaration you are about to create does not already exist. Do not duplicate logic; reuse existing components wherever possible.
-2.  **Architectural Alignment (Path Check):** Verify the exact folder path where you are placing new files. You must adhere to the "Package by Feature" and Hexagonal Architecture rules defined in `architect/clean_code_guidelines.md`. Ensure you are writing to `[feature]/api/`, `[feature]/core/`, or `[feature]/infrastructure/` as appropriate.
+2.  **Architectural Alignment (Path Check):** Verify the exact folder path where you are placing new files. You must adhere to the "Package by Feature" and Hexagonal Architecture rules defined in `architect/clean_code_guidelines.md` and `architect/structure.md`. Ensure you are writing to `[feature]/api/`, `[feature]/core/`, or `[feature]/infrastructure/` as appropriate.
 3.  **Code Style Verification:** Ensure the code matches the elite standard: 
     *   Use Java 25 features (e.g., `records` instead of `@Data` for DTOs).
     *   Use Constructor Injection (`@RequiredArgsConstructor`) instead of `@Autowired` fields.

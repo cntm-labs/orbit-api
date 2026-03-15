@@ -1,0 +1,42 @@
+```mermaid
+erDiagram
+    %% ==========================================
+    %% AI & CHAT COLLECTIONS (MongoDB)
+    %% ==========================================
+    %% Optimized for Document Storage (Embedding & Referencing)
+
+    conversations {
+        ObjectId _id PK
+        UUID user_id
+        string title
+        string type "SUPPORT, AI_ADVISOR, PERSONAL"
+        timestamp created_at
+        timestamp last_message_at
+        string status "ACTIVE, ARCHIVED"
+        object metadata "context, category"
+    }
+
+    messages {
+        ObjectId _id PK
+        ObjectId conversation_id FK
+        string sender_type "USER, AI, SYSTEM"
+        string content
+        string role "user, assistant, system"
+        array attachments "links, images"
+        object tokens_used "input, output"
+        timestamp sent_at
+    }
+
+    ai_interactions {
+        ObjectId _id PK
+        ObjectId message_id FK
+        string model_version "gpt-4o, gemini-1.5-pro"
+        float response_time_ms
+        object prompt_template
+        object raw_response
+        boolean was_helpful
+    }
+
+    conversations ||--o{ messages : "contains"
+    messages ||--o| ai_interactions : "processed_by"
+```

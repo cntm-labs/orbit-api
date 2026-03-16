@@ -4,13 +4,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.mrbt.orbit.audit.core.model.Notification;
 import com.mrbt.orbit.audit.core.port.out.NotificationRepositoryPort;
 import com.mrbt.orbit.audit.infrastructure.entity.NotificationEntity;
 import com.mrbt.orbit.audit.infrastructure.mapper.NotificationEntityMapper;
+import com.mrbt.orbit.common.core.model.PageResult;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,8 +37,12 @@ public class NotificationRepositoryAdapter implements NotificationRepositoryPort
 	}
 
 	@Override
-	public Page<Notification> findByUserId(UUID userId, Pageable pageable) {
-		return springDataRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable).map(mapper::toDomain);
+	public PageResult<Notification> findByUserId(UUID userId, int page, int size) {
+		Page<NotificationEntity> entityPage = springDataRepository.findByUserIdOrderByCreatedAtDesc(userId,
+				PageRequest.of(page, size));
+
+		return new PageResult<>(mapper.toDomainList(entityPage.getContent()), entityPage.getTotalElements(),
+				entityPage.getTotalPages(), entityPage.getNumber(), entityPage.getSize());
 	}
 
 	@Override
@@ -45,11 +51,13 @@ public class NotificationRepositoryAdapter implements NotificationRepositoryPort
 	}
 
 	@Override
+	@Transactional
 	public void markAsReadById(UUID id) {
 		springDataRepository.markAsReadById(id);
 	}
 
 	@Override
+	@Transactional
 	public void markAllAsReadByUserId(UUID userId) {
 		springDataRepository.markAllAsReadByUserId(userId);
 	}

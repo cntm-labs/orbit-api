@@ -3,10 +3,8 @@ package com.mrbt.orbit.audit.core.port.out;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import com.mrbt.orbit.audit.core.model.Notification;
+import com.mrbt.orbit.common.core.model.PageResult;
 
 public interface NotificationRepositoryPort {
 
@@ -14,7 +12,7 @@ public interface NotificationRepositoryPort {
 
 	Optional<Notification> findById(UUID id);
 
-	Page<Notification> findByUserId(UUID userId, Pageable pageable);
+	PageResult<Notification> findByUserId(UUID userId, int page, int size);
 
 	long countUnreadByUserId(UUID userId);
 

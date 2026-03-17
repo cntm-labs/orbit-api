@@ -56,6 +56,73 @@ const productResults: SearchResult[] = [
 	},
 ];
 
+function SearchResultItem({
+	result,
+	index,
+	activeIndex,
+	onSelect,
+	onHover,
+}: {
+	result: SearchResult;
+	index: number;
+	activeIndex: number;
+	onSelect: (href: string) => void;
+	onHover: (index: number) => void;
+}) {
+	return (
+		<button
+			onMouseEnter={() => onHover(index)}
+			onClick={() => onSelect(result.href)}
+			className={cn(
+				"flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-left transition-colors",
+				activeIndex === index ? "bg-[#5DFDCB]/6" : "hover:bg-white/3",
+			)}
+		>
+			<span className="text-[#9B8FB8]">{result.icon}</span>
+			<div>
+				<div className="text-sm text-[#F0EDF5]">{result.name}</div>
+				<div className="text-xs text-[#9B8FB8]">{result.path}</div>
+			</div>
+		</button>
+	);
+}
+
+function SearchResultGroup({
+	label,
+	results,
+	indexOffset,
+	activeIndex,
+	onSelect,
+	onHover,
+}: {
+	label: string;
+	results: SearchResult[];
+	indexOffset: number;
+	activeIndex: number;
+	onSelect: (href: string) => void;
+	onHover: (index: number) => void;
+}) {
+	if (results.length === 0) return null;
+
+	return (
+		<div className="mb-2">
+			<p className="text-xs font-semibold uppercase tracking-wider text-[#9B8FB8] px-3 py-2">
+				{label}
+			</p>
+			{results.map((result, i) => (
+				<SearchResultItem
+					key={result.href}
+					result={result}
+					index={indexOffset + i}
+					activeIndex={activeIndex}
+					onSelect={onSelect}
+					onHover={onHover}
+				/>
+			))}
+		</div>
+	);
+}
+
 export default function SearchDialog({ locale }: { locale: string }) {
 	const t = useTranslations("nav");
 	const ts = useTranslations("search");
@@ -130,57 +197,22 @@ export default function SearchDialog({ locale }: { locale: string }) {
 						</kbd>
 					</div>
 					<div className="max-h-80 overflow-y-auto p-2">
-						{filteredDevelop.length > 0 && (
-							<div className="mb-2">
-								<p className="text-xs font-semibold uppercase tracking-wider text-[#9B8FB8] px-3 py-2">
-									{ts("develop_section")}
-								</p>
-								{filteredDevelop.map((result, i) => (
-									<button
-										key={result.href}
-										onMouseEnter={() => setActiveIndex(i)}
-										onClick={() => handleSelect(result.href)}
-										className={cn(
-											"flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-left transition-colors",
-											activeIndex === i ? "bg-[#5DFDCB]/6" : "hover:bg-white/3",
-										)}
-									>
-										<span className="text-[#9B8FB8]">{result.icon}</span>
-										<div>
-											<div className="text-sm text-[#F0EDF5]">{result.name}</div>
-											<div className="text-xs text-[#9B8FB8]">{result.path}</div>
-										</div>
-									</button>
-								))}
-							</div>
-						)}
-						{filteredProduct.length > 0 && (
-							<div>
-								<p className="text-xs font-semibold uppercase tracking-wider text-[#9B8FB8] px-3 py-2">
-									{ts("product_section")}
-								</p>
-								{filteredProduct.map((result, i) => {
-									const globalIndex = filteredDevelop.length + i;
-									return (
-										<button
-											key={result.href}
-											onMouseEnter={() => setActiveIndex(globalIndex)}
-											onClick={() => handleSelect(result.href)}
-											className={cn(
-												"flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-left transition-colors",
-												activeIndex === globalIndex ? "bg-[#5DFDCB]/6" : "hover:bg-white/3",
-											)}
-										>
-											<span className="text-[#9B8FB8]">{result.icon}</span>
-											<div>
-												<div className="text-sm text-[#F0EDF5]">{result.name}</div>
-												<div className="text-xs text-[#9B8FB8]">{result.path}</div>
-											</div>
-										</button>
-									);
-								})}
-							</div>
-						)}
+						<SearchResultGroup
+							label={ts("develop_section")}
+							results={filteredDevelop}
+							indexOffset={0}
+							activeIndex={activeIndex}
+							onSelect={handleSelect}
+							onHover={setActiveIndex}
+						/>
+						<SearchResultGroup
+							label={ts("product_section")}
+							results={filteredProduct}
+							indexOffset={filteredDevelop.length}
+							activeIndex={activeIndex}
+							onSelect={handleSelect}
+							onHover={setActiveIndex}
+						/>
 						{allResults.length === 0 && (
 							<div className="text-center py-8 text-sm text-[#9B8FB8]">{ts("no_results")}</div>
 						)}

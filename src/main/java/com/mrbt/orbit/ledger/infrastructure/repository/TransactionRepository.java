@@ -9,6 +9,6 @@ import com.mrbt.orbit.ledger.infrastructure.entity.TransactionEntity;
 
 public interface TransactionRepository extends JpaRepository<TransactionEntity, UUID> {
 
-	List<TransactionEntity> findByAccountId(UUID accountId);
+	List<TransactionEntity> findByAccount_Id(UUID accountId);
 
 }

@@ -13,6 +13,8 @@ import {
   Hexagon,
   Database,
   ChevronDown,
+  Tag,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SidebarShell from "@/components/SidebarShell";
@@ -22,6 +24,7 @@ const methodBadge = (method: string) => {
   const colors: Record<string, string> = {
     GET: "bg-[#5DFDCB]/15 text-[#5DFDCB]",
     POST: "bg-[#B07AFF]/15 text-[#B07AFF]",
+    PUT: "bg-[#FFB74D]/15 text-[#FFB74D]",
   };
   return (
     <span
@@ -91,6 +94,9 @@ export default function DevelopSidebar({
   const pathname = usePathname();
   const [usersOpen, setUsersOpen] = useState(true);
   const [accountsOpen, setAccountsOpen] = useState(true);
+  const [transactionsOpen, setTransactionsOpen] = useState(true);
+  const [categoriesOpen, setCategoriesOpen] = useState(true);
+  const [notificationsOpen, setNotificationsOpen] = useState(true);
 
   const isActive = (path: string) => pathname === path;
   const isSection = (path: string) => pathname.startsWith(path);
@@ -210,15 +216,149 @@ export default function DevelopSidebar({
               </div>
             )}
 
+            {/* Transactions - collapsible */}
+            <button
+              onClick={() => setTransactionsOpen(!transactionsOpen)}
+              className={cn(
+                "flex items-center gap-2.5 w-full px-3 py-1.5 text-sm rounded-lg transition-colors",
+                isSection(`/${locale}/develop/api/transactions`)
+                  ? "bg-[#5DFDCB]/10 text-[#5DFDCB]"
+                  : "text-[#9B8FB8] hover:bg-white/3 hover:text-[#F0EDF5]"
+              )}
+            >
+              <ArrowLeftRight className="size-4" />
+              <span>{t("transactions")}</span>
+              <ChevronDown
+                className={cn(
+                  "size-3 ml-auto transition-transform",
+                  transactionsOpen ? "" : "-rotate-90"
+                )}
+              />
+            </button>
+            {transactionsOpen && (
+              <div className="ml-7 space-y-0.5 border-l border-white/6 pl-3">
+                <Link
+                  href={`/${locale}/develop/api/transactions`}
+                  className="flex items-center gap-2 px-2 py-1 text-sm text-[#9B8FB8] hover:text-[#F0EDF5] rounded transition-colors"
+                >
+                  {methodBadge("POST")}
+                  <span>Create Transaction</span>
+                </Link>
+                <Link
+                  href={`/${locale}/develop/api/transactions`}
+                  className="flex items-center gap-2 px-2 py-1 text-sm text-[#9B8FB8] hover:text-[#F0EDF5] rounded transition-colors"
+                >
+                  {methodBadge("GET")}
+                  <span>Get by ID</span>
+                </Link>
+                <Link
+                  href={`/${locale}/develop/api/transactions`}
+                  className="flex items-center gap-2 px-2 py-1 text-sm text-[#9B8FB8] hover:text-[#F0EDF5] rounded transition-colors"
+                >
+                  {methodBadge("GET")}
+                  <span>Get by Account</span>
+                </Link>
+              </div>
+            )}
+
+            {/* Categories - collapsible */}
+            <button
+              onClick={() => setCategoriesOpen(!categoriesOpen)}
+              className={cn(
+                "flex items-center gap-2.5 w-full px-3 py-1.5 text-sm rounded-lg transition-colors",
+                isSection(`/${locale}/develop/api/categories`)
+                  ? "bg-[#5DFDCB]/10 text-[#5DFDCB]"
+                  : "text-[#9B8FB8] hover:bg-white/3 hover:text-[#F0EDF5]"
+              )}
+            >
+              <Tag className="size-4" />
+              <span>{t("categories")}</span>
+              <ChevronDown
+                className={cn(
+                  "size-3 ml-auto transition-transform",
+                  categoriesOpen ? "" : "-rotate-90"
+                )}
+              />
+            </button>
+            {categoriesOpen && (
+              <div className="ml-7 space-y-0.5 border-l border-white/6 pl-3">
+                <Link
+                  href={`/${locale}/develop/api/categories`}
+                  className="flex items-center gap-2 px-2 py-1 text-sm text-[#9B8FB8] hover:text-[#F0EDF5] rounded transition-colors"
+                >
+                  {methodBadge("POST")}
+                  <span>Create Category</span>
+                </Link>
+                <Link
+                  href={`/${locale}/develop/api/categories`}
+                  className="flex items-center gap-2 px-2 py-1 text-sm text-[#9B8FB8] hover:text-[#F0EDF5] rounded transition-colors"
+                >
+                  {methodBadge("GET")}
+                  <span>System Categories</span>
+                </Link>
+                <Link
+                  href={`/${locale}/develop/api/categories`}
+                  className="flex items-center gap-2 px-2 py-1 text-sm text-[#9B8FB8] hover:text-[#F0EDF5] rounded transition-colors"
+                >
+                  {methodBadge("GET")}
+                  <span>User Categories</span>
+                </Link>
+              </div>
+            )}
+
+            {/* Notifications - collapsible */}
+            <button
+              onClick={() => setNotificationsOpen(!notificationsOpen)}
+              className={cn(
+                "flex items-center gap-2.5 w-full px-3 py-1.5 text-sm rounded-lg transition-colors",
+                isSection(`/${locale}/develop/api/notifications`)
+                  ? "bg-[#5DFDCB]/10 text-[#5DFDCB]"
+                  : "text-[#9B8FB8] hover:bg-white/3 hover:text-[#F0EDF5]"
+              )}
+            >
+              <Bell className="size-4" />
+              <span>{t("notifications")}</span>
+              <ChevronDown
+                className={cn(
+                  "size-3 ml-auto transition-transform",
+                  notificationsOpen ? "" : "-rotate-90"
+                )}
+              />
+            </button>
+            {notificationsOpen && (
+              <div className="ml-7 space-y-0.5 border-l border-white/6 pl-3">
+                <Link
+                  href={`/${locale}/develop/api/notifications`}
+                  className="flex items-center gap-2 px-2 py-1 text-sm text-[#9B8FB8] hover:text-[#F0EDF5] rounded transition-colors"
+                >
+                  {methodBadge("GET")}
+                  <span>Get Notifications</span>
+                </Link>
+                <Link
+                  href={`/${locale}/develop/api/notifications`}
+                  className="flex items-center gap-2 px-2 py-1 text-sm text-[#9B8FB8] hover:text-[#F0EDF5] rounded transition-colors"
+                >
+                  {methodBadge("GET")}
+                  <span>Unread Count</span>
+                </Link>
+                <Link
+                  href={`/${locale}/develop/api/notifications`}
+                  className="flex items-center gap-2 px-2 py-1 text-sm text-[#9B8FB8] hover:text-[#F0EDF5] rounded transition-colors"
+                >
+                  {methodBadge("PUT")}
+                  <span>Mark as Read</span>
+                </Link>
+                <Link
+                  href={`/${locale}/develop/api/notifications`}
+                  className="flex items-center gap-2 px-2 py-1 text-sm text-[#9B8FB8] hover:text-[#F0EDF5] rounded transition-colors"
+                >
+                  {methodBadge("PUT")}
+                  <span>Mark All Read</span>
+                </Link>
+              </div>
+            )}
+
             {/* Disabled items */}
-            <SidebarLink
-              href="#"
-              icon={ArrowLeftRight}
-              label={t("transactions")}
-              active={false}
-              disabled
-              badge={t("soon")}
-            />
             <SidebarLink
               href="#"
               icon={CreditCard}

@@ -3,22 +3,20 @@ import DevelopSidebar from "@/components/DevelopSidebar";
 import OnPageToc from "@/components/OnPageToc";
 
 export default async function DevelopLayout({
-  children,
-  params,
+	children,
+	params,
 }: {
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
+	children: React.ReactNode;
+	params: Promise<{ locale: string }>;
 }) {
-  const { locale } = await params;
-  setRequestLocale(locale);
+	const { locale } = await params;
+	setRequestLocale(locale);
 
-  return (
-    <div className="flex flex-1 relative">
-      <DevelopSidebar locale={locale} />
-      <main className="flex-1 min-w-0 px-4 sm:px-6 lg:px-10 py-8">
-        {children}
-      </main>
-      <OnPageToc />
-    </div>
-  );
+	return (
+		<div className="flex flex-1 relative">
+			<DevelopSidebar locale={locale} />
+			<main className="flex-1 min-w-0 px-4 sm:px-6 lg:px-10 py-8">{children}</main>
+			<OnPageToc />
+		</div>
+	);
 }

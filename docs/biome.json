@@ -1,0 +1,57 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.4.7/schema.json",
+	"assist": { "actions": { "source": { "organizeImports": "on" } } },
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"indentWidth": 2,
+		"lineWidth": 100
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"complexity": {
+				"noExcessiveCognitiveComplexity": {
+					"level": "warn",
+					"options": { "maxAllowedComplexity": 15 }
+				}
+			},
+			"style": {
+				"noNonNullAssertion": "off",
+				"useImportType": "off"
+			},
+			"correctness": {
+				"noUnusedImports": "warn",
+				"noUnusedVariables": "warn"
+			},
+			"a11y": {
+				"useButtonType": "warn",
+				"noSvgWithoutTitle": "warn"
+			},
+			"suspicious": {
+				"noExplicitAny": "warn",
+				"noShadowRestrictedNames": "warn",
+				"noArrayIndexKey": "warn"
+			},
+			"performance": {
+				"noImgElement": "warn"
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double",
+			"semicolons": "always"
+		}
+	},
+	"css": {
+		"parser": {
+			"cssModules": true,
+			"tailwindDirectives": true
+		}
+	},
+	"files": {
+		"includes": ["**", "!**/.next", "!**/out", "!**/node_modules", "!**/next-env.d.ts"]
+	}
+}

@@ -1,120 +1,105 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import Breadcrumb from "@/components/Breadcrumb";
 import ApiEndpoint from "@/components/ApiEndpoint";
-import ParamTable from "@/components/ParamTable";
+import Breadcrumb from "@/components/Breadcrumb";
 import CodeBlock from "@/components/CodeBlock";
 import PageNav from "@/components/PageNav";
+import ParamTable from "@/components/ParamTable";
 
 export default function AccountsAPIPage() {
-  const locale = useLocale();
-  const t = useTranslations("pages");
-  const ta = useTranslations("api");
+	const locale = useLocale();
+	const t = useTranslations("pages");
+	const ta = useTranslations("api");
 
-  return (
-    <div className="space-y-8">
-      <Breadcrumb
-        items={[
-          { label: "Develop", href: `/${locale}/develop/getting-started` },
-          { label: "API Reference" },
-          { label: t("accounts_api_title").replace(" API", "").replace("API ", "") },
-        ]}
-      />
+	return (
+		<div className="space-y-8">
+			<Breadcrumb
+				items={[
+					{ label: "Develop", href: `/${locale}/develop/getting-started` },
+					{ label: "API Reference" },
+					{ label: t("accounts_api_title").replace(" API", "").replace("API ", "") },
+				]}
+			/>
 
-      <div>
-        <h1 className="text-3xl font-bold text-[#F0EDF5] mb-2">
-          {t("accounts_api_title")}
-        </h1>
-        <p className="text-[#9B8FB8] leading-relaxed">
-          {t("accounts_api_desc")}
-        </p>
-      </div>
+			<div>
+				<h1 className="text-3xl font-bold text-[#F0EDF5] mb-2">{t("accounts_api_title")}</h1>
+				<p className="text-[#9B8FB8] leading-relaxed">{t("accounts_api_desc")}</p>
+			</div>
 
-      {/* POST /api/v1/accounts */}
-      <div className="space-y-4">
-        <h2
-          id="create-account"
-          className="text-xl font-semibold text-[#F0EDF5]"
-        >
-          {t("create_account")}
-        </h2>
-        <ApiEndpoint
-          method="POST"
-          path="/api/v1/accounts"
-          description="Creates a new financial account for a specific user"
-        >
-          <div className="space-y-6">
-            <div>
-              <h3
-                id="create-account-body"
-                className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
-              >
-                {ta("request_body")}
-              </h3>
-              <ParamTable
-                params={[
-                  {
-                    name: "userId",
-                    type: "string (uuid)",
-                    required: true,
-                    description: "The UUID of the user who owns this account",
-                  },
-                  {
-                    name: "name",
-                    type: "string",
-                    required: true,
-                    description:
-                      "Display name for the account (e.g., \"Main Checking\")",
-                  },
-                  {
-                    name: "type",
-                    type: "string (enum)",
-                    required: true,
-                    description: "The type of financial account",
-                    enumValues: [
-                      "BANK",
-                      "CREDIT",
-                      "CRYPTO",
-                      "CASH",
-                      "INVESTMENT",
-                    ],
-                  },
-                  {
-                    name: "currencyCode",
-                    type: "string",
-                    required: true,
-                    description:
-                      "ISO 4217 currency code or crypto symbol (e.g., USD, BTC)",
-                  },
-                  {
-                    name: "initialBalance",
-                    type: "number",
-                    required: false,
-                    description: "Starting balance for the account (default: 0)",
-                  },
-                  {
-                    name: "plaidAccountId",
-                    type: "string",
-                    required: false,
-                    description: "External Plaid account ID for linked accounts",
-                  },
-                ]}
-              />
-            </div>
+			{/* POST /api/v1/accounts */}
+			<div className="space-y-4">
+				<h2 id="create-account" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("create_account")}
+				</h2>
+				<ApiEndpoint
+					method="POST"
+					path="/api/v1/accounts"
+					description="Creates a new financial account for a specific user"
+				>
+					<div className="space-y-6">
+						<div>
+							<h3
+								id="create-account-body"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("request_body")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "userId",
+										type: "string (uuid)",
+										required: true,
+										description: "The UUID of the user who owns this account",
+									},
+									{
+										name: "name",
+										type: "string",
+										required: true,
+										description: 'Display name for the account (e.g., "Main Checking")',
+									},
+									{
+										name: "type",
+										type: "string (enum)",
+										required: true,
+										description: "The type of financial account",
+										enumValues: ["BANK", "CREDIT", "CRYPTO", "CASH", "INVESTMENT"],
+									},
+									{
+										name: "currencyCode",
+										type: "string",
+										required: true,
+										description: "ISO 4217 currency code or crypto symbol (e.g., USD, BTC)",
+									},
+									{
+										name: "initialBalance",
+										type: "number",
+										required: false,
+										description: "Starting balance for the account (default: 0)",
+									},
+									{
+										name: "plaidAccountId",
+										type: "string",
+										required: false,
+										description: "External Plaid account ID for linked accounts",
+									},
+								]}
+							/>
+						</div>
 
-            <div>
-              <h3
-                id="create-account-example"
-                className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
-              >
-                {ta("example_request")}
-              </h3>
-              <CodeBlock
-                tabs={[
-                  {
-                    label: "cURL",
-                    code: `curl -X POST http://localhost:8080/api/v1/accounts \\
+						<div>
+							<h3
+								id="create-account-example"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("example_request")}
+							</h3>
+							<CodeBlock
+								tabs={[
+									{
+										label: "cURL",
+										code: `curl -X POST http://localhost:8080/api/v1/accounts \\
   -H "Content-Type: application/json" \\
   -d '{
     "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
@@ -123,10 +108,10 @@ export default function AccountsAPIPage() {
     "currencyCode": "USD",
     "initialBalance": 5000.00
   }'`,
-                  },
-                  {
-                    label: "JavaScript",
-                    code: `const response = await fetch("http://localhost:8080/api/v1/accounts", {
+									},
+									{
+										label: "JavaScript",
+										code: `const response = await fetch("http://localhost:8080/api/v1/accounts", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -142,10 +127,10 @@ export default function AccountsAPIPage() {
 
 const data = await response.json();
 console.log(data);`,
-                  },
-                  {
-                    label: "Python",
-                    code: `import requests
+									},
+									{
+										label: "Python",
+										code: `import requests
 
 response = requests.post(
     "http://localhost:8080/api/v1/accounts",
@@ -159,24 +144,24 @@ response = requests.post(
 )
 
 print(response.json())`,
-                  },
-                ]}
-              />
-            </div>
+									},
+								]}
+							/>
+						</div>
 
-            <div>
-              <h3
-                id="create-account-response"
-                className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
-              >
-                {ta("response")}
-              </h3>
-              <CodeBlock
-                response
-                tabs={[
-                  {
-                    label: "JSON",
-                    code: `{
+						<div>
+							<h3
+								id="create-account-response"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("response")}
+							</h3>
+							<CodeBlock
+								response
+								tabs={[
+									{
+										label: "JSON",
+										code: `{
   "success": true,
   "message": "Account created successfully",
   "data": {
@@ -193,96 +178,93 @@ print(response.json())`,
   },
   "timestamp": "2026-03-15T10:35:00Z"
 }`,
-                  },
-                ]}
-              />
-            </div>
-          </div>
-        </ApiEndpoint>
-      </div>
+									},
+								]}
+							/>
+						</div>
+					</div>
+				</ApiEndpoint>
+			</div>
 
-      {/* GET /api/v1/accounts/{accountId} */}
-      <div className="space-y-4">
-        <h2
-          id="get-account-by-id"
-          className="text-xl font-semibold text-[#F0EDF5]"
-        >
-          {t("get_by_id")}
-        </h2>
-        <ApiEndpoint
-          method="GET"
-          path="/api/v1/accounts/{accountId}"
-          description="Retrieves a specific account by its ID"
-        >
-          <div className="space-y-6">
-            <div>
-              <h3
-                id="get-account-params"
-                className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
-              >
-                {ta("path_params")}
-              </h3>
-              <ParamTable
-                params={[
-                  {
-                    name: "accountId",
-                    type: "string (uuid)",
-                    required: true,
-                    description: "The UUID of the account to retrieve",
-                  },
-                ]}
-              />
-            </div>
+			{/* GET /api/v1/accounts/{accountId} */}
+			<div className="space-y-4">
+				<h2 id="get-account-by-id" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("get_by_id")}
+				</h2>
+				<ApiEndpoint
+					method="GET"
+					path="/api/v1/accounts/{accountId}"
+					description="Retrieves a specific account by its ID"
+				>
+					<div className="space-y-6">
+						<div>
+							<h3
+								id="get-account-params"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("path_params")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "accountId",
+										type: "string (uuid)",
+										required: true,
+										description: "The UUID of the account to retrieve",
+									},
+								]}
+							/>
+						</div>
 
-            <div>
-              <h3
-                id="get-account-example"
-                className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
-              >
-                {ta("example_request")}
-              </h3>
-              <CodeBlock
-                tabs={[
-                  {
-                    label: "cURL",
-                    code: `curl http://localhost:8080/api/v1/accounts/f7e6d5c4-b3a2-1908-fedc-ba0987654321`,
-                  },
-                  {
-                    label: "JavaScript",
-                    code: `const response = await fetch(
+						<div>
+							<h3
+								id="get-account-example"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("example_request")}
+							</h3>
+							<CodeBlock
+								tabs={[
+									{
+										label: "cURL",
+										code: `curl http://localhost:8080/api/v1/accounts/f7e6d5c4-b3a2-1908-fedc-ba0987654321`,
+									},
+									{
+										label: "JavaScript",
+										code: `const response = await fetch(
   "http://localhost:8080/api/v1/accounts/f7e6d5c4-b3a2-1908-fedc-ba0987654321"
 );
 
 const data = await response.json();
 console.log(data);`,
-                  },
-                  {
-                    label: "Python",
-                    code: `import requests
+									},
+									{
+										label: "Python",
+										code: `import requests
 
 response = requests.get(
     "http://localhost:8080/api/v1/accounts/f7e6d5c4-b3a2-1908-fedc-ba0987654321"
 )
 
 print(response.json())`,
-                  },
-                ]}
-              />
-            </div>
+									},
+								]}
+							/>
+						</div>
 
-            <div>
-              <h3
-                id="get-account-response"
-                className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
-              >
-                {ta("response")}
-              </h3>
-              <CodeBlock
-                response
-                tabs={[
-                  {
-                    label: "JSON",
-                    code: `{
+						<div>
+							<h3
+								id="get-account-response"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("response")}
+							</h3>
+							<CodeBlock
+								response
+								tabs={[
+									{
+										label: "JSON",
+										code: `{
   "success": true,
   "message": "Account retrieved successfully",
   "data": {
@@ -299,97 +281,93 @@ print(response.json())`,
   },
   "timestamp": "2026-03-15T10:35:00Z"
 }`,
-                  },
-                ]}
-              />
-            </div>
-          </div>
-        </ApiEndpoint>
-      </div>
+									},
+								]}
+							/>
+						</div>
+					</div>
+				</ApiEndpoint>
+			</div>
 
-      {/* GET /api/v1/accounts/user/{userId} */}
-      <div className="space-y-4">
-        <h2
-          id="get-accounts-by-user"
-          className="text-xl font-semibold text-[#F0EDF5]"
-        >
-          {t("get_by_user")}
-        </h2>
-        <ApiEndpoint
-          method="GET"
-          path="/api/v1/accounts/user/{userId}"
-          description="Retrieves all accounts belonging to a specific user"
-        >
-          <div className="space-y-6">
-            <div>
-              <h3
-                id="get-user-accounts-params"
-                className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
-              >
-                {ta("path_params")}
-              </h3>
-              <ParamTable
-                params={[
-                  {
-                    name: "userId",
-                    type: "string (uuid)",
-                    required: true,
-                    description:
-                      "The UUID of the user whose accounts to retrieve",
-                  },
-                ]}
-              />
-            </div>
+			{/* GET /api/v1/accounts/user/{userId} */}
+			<div className="space-y-4">
+				<h2 id="get-accounts-by-user" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("get_by_user")}
+				</h2>
+				<ApiEndpoint
+					method="GET"
+					path="/api/v1/accounts/user/{userId}"
+					description="Retrieves all accounts belonging to a specific user"
+				>
+					<div className="space-y-6">
+						<div>
+							<h3
+								id="get-user-accounts-params"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("path_params")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "userId",
+										type: "string (uuid)",
+										required: true,
+										description: "The UUID of the user whose accounts to retrieve",
+									},
+								]}
+							/>
+						</div>
 
-            <div>
-              <h3
-                id="get-user-accounts-example"
-                className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
-              >
-                {ta("example_request")}
-              </h3>
-              <CodeBlock
-                tabs={[
-                  {
-                    label: "cURL",
-                    code: `curl http://localhost:8080/api/v1/accounts/user/a1b2c3d4-e5f6-7890-abcd-ef1234567890`,
-                  },
-                  {
-                    label: "JavaScript",
-                    code: `const response = await fetch(
+						<div>
+							<h3
+								id="get-user-accounts-example"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("example_request")}
+							</h3>
+							<CodeBlock
+								tabs={[
+									{
+										label: "cURL",
+										code: `curl http://localhost:8080/api/v1/accounts/user/a1b2c3d4-e5f6-7890-abcd-ef1234567890`,
+									},
+									{
+										label: "JavaScript",
+										code: `const response = await fetch(
   "http://localhost:8080/api/v1/accounts/user/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
 );
 
 const data = await response.json();
 console.log(data);`,
-                  },
-                  {
-                    label: "Python",
-                    code: `import requests
+									},
+									{
+										label: "Python",
+										code: `import requests
 
 response = requests.get(
     "http://localhost:8080/api/v1/accounts/user/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
 )
 
 print(response.json())`,
-                  },
-                ]}
-              />
-            </div>
+									},
+								]}
+							/>
+						</div>
 
-            <div>
-              <h3
-                id="get-user-accounts-response"
-                className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
-              >
-                {ta("response")}
-              </h3>
-              <CodeBlock
-                response
-                tabs={[
-                  {
-                    label: "JSON",
-                    code: `{
+						<div>
+							<h3
+								id="get-user-accounts-response"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("response")}
+							</h3>
+							<CodeBlock
+								response
+								tabs={[
+									{
+										label: "JSON",
+										code: `{
   "success": true,
   "message": "Accounts retrieved successfully",
   "data": [
@@ -420,24 +398,24 @@ print(response.json())`,
   ],
   "timestamp": "2026-03-15T10:45:00Z"
 }`,
-                  },
-                ]}
-              />
-            </div>
-          </div>
-        </ApiEndpoint>
-      </div>
+									},
+								]}
+							/>
+						</div>
+					</div>
+				</ApiEndpoint>
+			</div>
 
-      <PageNav
-        prev={{
-          label: "Users API",
-          href: `/${locale}/develop/api/users`,
-        }}
-        next={{
-          label: "Transactions API",
-          href: `/${locale}/develop/api/transactions`,
-        }}
-      />
-    </div>
-  );
+			<PageNav
+				prev={{
+					label: "Users API",
+					href: `/${locale}/develop/api/users`,
+				}}
+				next={{
+					label: "Transactions API",
+					href: `/${locale}/develop/api/transactions`,
+				}}
+			/>
+		</div>
+	);
 }

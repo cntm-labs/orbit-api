@@ -85,6 +85,18 @@ Cross-cutting concerns live in `common/` and `config/`.
 - **Documentation Verification:** `scripts/verify-docs.sh` ensures no endpoint is merged undocumented
 - **Dependabot:** Weekly automated dependency updates
 
+## Code Quality Hooks (PostWrite Auto-Fix)
+
+Claude Code PostWrite hooks auto-run on every file write:
+- **JS/TS files** (`docs/**/*.{ts,tsx,js,jsx}`) → `biome check --write` (format + lint fix)
+- **Java files** (`src/**/*.java`) → `./mvnw spotless:apply` (Eclipse JDT format)
+
+Rules enforced:
+- Max nesting depth: 3 levels for TypeScript/JavaScript
+- Cognitive complexity limit: 15 for TypeScript/JavaScript
+- If Biome reports errors after write, fix them before moving on
+- Prefer extracting components/functions over deep nesting
+
 ## AI Agent Hooks (Pre-Write Checks)
 
 Before creating or modifying code, you MUST:

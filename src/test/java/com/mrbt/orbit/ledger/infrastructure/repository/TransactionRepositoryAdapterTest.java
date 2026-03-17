@@ -128,7 +128,7 @@ class TransactionRepositoryAdapterTest {
 		TransactionEntity entity = new TransactionEntity();
 		Transaction mapped = Transaction.builder().id(UUID.randomUUID()).build();
 
-		when(springDataRepository.findByAccountId(accountId)).thenReturn(List.of(entity));
+		when(springDataRepository.findByAccount_Id(accountId)).thenReturn(List.of(entity));
 		when(mapper.toDomain(entity)).thenReturn(mapped);
 
 		assertThat(adapter.findByAccountId(accountId)).hasSize(1);

@@ -1,6 +1,7 @@
 package com.mrbt.orbit.ledger.infrastructure.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.ledger.core.model.Category;
 import com.mrbt.orbit.ledger.core.model.enums.CategoryType;
 import com.mrbt.orbit.ledger.infrastructure.entity.CategoryEntity;
@@ -85,6 +87,43 @@ class CategoryRepositoryAdapterTest {
 		when(springDataRepository.existsByUserIdAndName(userId, "Food")).thenReturn(true);
 
 		assertThat(adapter.existsByUserIdAndName(userId, "Food")).isTrue();
+	}
+
+	@Test
+	void save_withParentCategoryId_resolvesParentRelationship() {
+		UUID parentId = UUID.randomUUID();
+		Category domain = Category.builder().name("Groceries").type(CategoryType.EXPENSE).parentCategoryId(parentId)
+				.build();
+		CategoryEntity entity = new CategoryEntity();
+		CategoryEntity parentEntity = new CategoryEntity();
+		parentEntity.setId(parentId);
+		CategoryEntity savedEntity = new CategoryEntity();
+		Category expected = Category.builder().id(UUID.randomUUID()).name("Groceries").parentCategoryId(parentId)
+				.build();
+
+		when(mapper.toEntity(domain)).thenReturn(entity);
+		when(springDataRepository.findById(parentId)).thenReturn(Optional.of(parentEntity));
+		when(springDataRepository.save(entity)).thenReturn(savedEntity);
+		when(mapper.toDomain(savedEntity)).thenReturn(expected);
+
+		Category result = adapter.save(domain);
+
+		assertThat(result).isEqualTo(expected);
+		assertThat(entity.getParentCategory()).isEqualTo(parentEntity);
+	}
+
+	@Test
+	void save_withInvalidParentCategoryId_throwsResourceNotFoundException() {
+		UUID parentId = UUID.randomUUID();
+		Category domain = Category.builder().name("Groceries").type(CategoryType.EXPENSE).parentCategoryId(parentId)
+				.build();
+		CategoryEntity entity = new CategoryEntity();
+
+		when(mapper.toEntity(domain)).thenReturn(entity);
+		when(springDataRepository.findById(parentId)).thenReturn(Optional.empty());
+
+		assertThatThrownBy(() -> adapter.save(domain)).isInstanceOf(ResourceNotFoundException.class)
+				.hasMessageContaining(parentId.toString());
 	}
 
 }

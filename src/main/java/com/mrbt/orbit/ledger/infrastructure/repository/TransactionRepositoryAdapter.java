@@ -47,7 +47,7 @@ public class TransactionRepositoryAdapter implements TransactionRepositoryPort {
 
 	@Override
 	public List<Transaction> findByAccountId(UUID accountId) {
-		return springDataRepository.findByAccountId(accountId).stream().map(mapper::toDomain)
+		return springDataRepository.findByAccount_Id(accountId).stream().map(mapper::toDomain)
 				.collect(Collectors.toList());
 	}
 }

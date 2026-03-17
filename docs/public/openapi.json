@@ -1,1 +1,214 @@
-{"openapi":"3.1.0","info":{"title":"Orbit PFM API","description":"Personal Finance Management System","version":"1.0.0"},"servers":[{"url":"http://localhost:8080","description":"Generated server url"}],"tags":[{"name":"Users","description":"User management and Clerk synchronization endpoints"},{"name":"Accounts","description":"Ledger account management for tracking fiat and crypto assets"}],"paths":{"/api/v1/users":{"post":{"tags":["Users"],"summary":"Register a new user","description":"Syncs a newly registered Clerk user into the local database","operationId":"registerUser","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateUserRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResponseUserResponse"}}}}}}},"/api/v1/accounts":{"post":{"tags":["Accounts"],"summary":"Create a new account","description":"Creates a new financial account for a specific user","operationId":"createAccount","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateAccountRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResponseAccountResponse"}}}}}}},"/api/v1/users/clerk/{clerkUserId}":{"get":{"tags":["Users"],"summary":"Get user by Clerk ID","description":"Retrieves a local user profile using their external Clerk ID","operationId":"getUserByClerkId","parameters":[{"name":"clerkUserId","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResponseUserResponse"}}}}}}},"/api/v1/accounts/{accountId}":{"get":{"tags":["Accounts"],"summary":"Get account by ID","description":"Retrieves a specific account by its ID","operationId":"getAccountById","parameters":[{"name":"accountId","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResponseAccountResponse"}}}}}}},"/api/v1/accounts/user/{userId}":{"get":{"tags":["Accounts"],"summary":"Get all accounts for a user","description":"Retrieves all accounts belonging to a specific user","operationId":"getAccountsByUserId","parameters":[{"name":"userId","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResponseListAccountResponse"}}}}}}}},"components":{"schemas":{"CreateUserRequest":{"type":"object","properties":{"clerkUserId":{"type":"string","minLength":1},"email":{"type":"string","format":"email","minLength":1},"firstName":{"type":"string"},"lastName":{"type":"string"},"baseCurrency":{"type":"string"},"timezone":{"type":"string"}},"required":["clerkUserId","email"]},"ApiResponseUserResponse":{"type":"object","properties":{"success":{"type":"boolean"},"message":{"type":"string"},"data":{"$ref":"#/components/schemas/UserResponse"},"timestamp":{"type":"string","format":"date-time"}}},"UserResponse":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"email":{"type":"string"},"firstName":{"type":"string"},"lastName":{"type":"string"},"baseCurrency":{"type":"string"},"timezone":{"type":"string"},"status":{"type":"string"},"createdAt":{"type":"string","format":"date-time"}}},"CreateAccountRequest":{"type":"object","properties":{"userId":{"type":"string","format":"uuid"},"name":{"type":"string","minLength":1},"type":{"type":"string","enum":["BANK","CREDIT","CRYPTO","CASH","INVESTMENT"]},"currencyCode":{"type":"string","minLength":1},"initialBalance":{"type":"number"},"plaidAccountId":{"type":"string"}},"required":["currencyCode","name","type","userId"]},"AccountResponse":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"userId":{"type":"string","format":"uuid"},"name":{"type":"string"},"type":{"type":"string"},"currencyCode":{"type":"string"},"currentBalance":{"type":"number"},"plaidAccountId":{"type":"string"},"status":{"type":"string"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"}}},"ApiResponseAccountResponse":{"type":"object","properties":{"success":{"type":"boolean"},"message":{"type":"string"},"data":{"$ref":"#/components/schemas/AccountResponse"},"timestamp":{"type":"string","format":"date-time"}}},"ApiResponseListAccountResponse":{"type":"object","properties":{"success":{"type":"boolean"},"message":{"type":"string"},"data":{"type":"array","items":{"$ref":"#/components/schemas/AccountResponse"}},"timestamp":{"type":"string","format":"date-time"}}}}}}
+{
+	"openapi": "3.1.0",
+	"info": {
+		"title": "Orbit PFM API",
+		"description": "Personal Finance Management System",
+		"version": "1.0.0"
+	},
+	"servers": [{ "url": "http://localhost:8080", "description": "Generated server url" }],
+	"tags": [
+		{ "name": "Users", "description": "User management and Clerk synchronization endpoints" },
+		{
+			"name": "Accounts",
+			"description": "Ledger account management for tracking fiat and crypto assets"
+		}
+	],
+	"paths": {
+		"/api/v1/users": {
+			"post": {
+				"tags": ["Users"],
+				"summary": "Register a new user",
+				"description": "Syncs a newly registered Clerk user into the local database",
+				"operationId": "registerUser",
+				"requestBody": {
+					"content": {
+						"application/json": { "schema": { "$ref": "#/components/schemas/CreateUserRequest" } }
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": { "schema": { "$ref": "#/components/schemas/ApiResponseUserResponse" } }
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/accounts": {
+			"post": {
+				"tags": ["Accounts"],
+				"summary": "Create a new account",
+				"description": "Creates a new financial account for a specific user",
+				"operationId": "createAccount",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": { "$ref": "#/components/schemas/CreateAccountRequest" }
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": { "schema": { "$ref": "#/components/schemas/ApiResponseAccountResponse" } }
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/users/clerk/{clerkUserId}": {
+			"get": {
+				"tags": ["Users"],
+				"summary": "Get user by Clerk ID",
+				"description": "Retrieves a local user profile using their external Clerk ID",
+				"operationId": "getUserByClerkId",
+				"parameters": [
+					{ "name": "clerkUserId", "in": "path", "required": true, "schema": { "type": "string" } }
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": { "schema": { "$ref": "#/components/schemas/ApiResponseUserResponse" } }
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/accounts/{accountId}": {
+			"get": {
+				"tags": ["Accounts"],
+				"summary": "Get account by ID",
+				"description": "Retrieves a specific account by its ID",
+				"operationId": "getAccountById",
+				"parameters": [
+					{
+						"name": "accountId",
+						"in": "path",
+						"required": true,
+						"schema": { "type": "string", "format": "uuid" }
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": { "schema": { "$ref": "#/components/schemas/ApiResponseAccountResponse" } }
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/accounts/user/{userId}": {
+			"get": {
+				"tags": ["Accounts"],
+				"summary": "Get all accounts for a user",
+				"description": "Retrieves all accounts belonging to a specific user",
+				"operationId": "getAccountsByUserId",
+				"parameters": [
+					{
+						"name": "userId",
+						"in": "path",
+						"required": true,
+						"schema": { "type": "string", "format": "uuid" }
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": { "schema": { "$ref": "#/components/schemas/ApiResponseListAccountResponse" } }
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"CreateUserRequest": {
+				"type": "object",
+				"properties": {
+					"clerkUserId": { "type": "string", "minLength": 1 },
+					"email": { "type": "string", "format": "email", "minLength": 1 },
+					"firstName": { "type": "string" },
+					"lastName": { "type": "string" },
+					"baseCurrency": { "type": "string" },
+					"timezone": { "type": "string" }
+				},
+				"required": ["clerkUserId", "email"]
+			},
+			"ApiResponseUserResponse": {
+				"type": "object",
+				"properties": {
+					"success": { "type": "boolean" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/UserResponse" },
+					"timestamp": { "type": "string", "format": "date-time" }
+				}
+			},
+			"UserResponse": {
+				"type": "object",
+				"properties": {
+					"id": { "type": "string", "format": "uuid" },
+					"email": { "type": "string" },
+					"firstName": { "type": "string" },
+					"lastName": { "type": "string" },
+					"baseCurrency": { "type": "string" },
+					"timezone": { "type": "string" },
+					"status": { "type": "string" },
+					"createdAt": { "type": "string", "format": "date-time" }
+				}
+			},
+			"CreateAccountRequest": {
+				"type": "object",
+				"properties": {
+					"userId": { "type": "string", "format": "uuid" },
+					"name": { "type": "string", "minLength": 1 },
+					"type": { "type": "string", "enum": ["BANK", "CREDIT", "CRYPTO", "CASH", "INVESTMENT"] },
+					"currencyCode": { "type": "string", "minLength": 1 },
+					"initialBalance": { "type": "number" },
+					"plaidAccountId": { "type": "string" }
+				},
+				"required": ["currencyCode", "name", "type", "userId"]
+			},
+			"AccountResponse": {
+				"type": "object",
+				"properties": {
+					"id": { "type": "string", "format": "uuid" },
+					"userId": { "type": "string", "format": "uuid" },
+					"name": { "type": "string" },
+					"type": { "type": "string" },
+					"currencyCode": { "type": "string" },
+					"currentBalance": { "type": "number" },
+					"plaidAccountId": { "type": "string" },
+					"status": { "type": "string" },
+					"createdAt": { "type": "string", "format": "date-time" },
+					"updatedAt": { "type": "string", "format": "date-time" }
+				}
+			},
+			"ApiResponseAccountResponse": {
+				"type": "object",
+				"properties": {
+					"success": { "type": "boolean" },
+					"message": { "type": "string" },
+					"data": { "$ref": "#/components/schemas/AccountResponse" },
+					"timestamp": { "type": "string", "format": "date-time" }
+				}
+			},
+			"ApiResponseListAccountResponse": {
+				"type": "object",
+				"properties": {
+					"success": { "type": "boolean" },
+					"message": { "type": "string" },
+					"data": { "type": "array", "items": { "$ref": "#/components/schemas/AccountResponse" } },
+					"timestamp": { "type": "string", "format": "date-time" }
+				}
+			}
+		}
+	}
+}

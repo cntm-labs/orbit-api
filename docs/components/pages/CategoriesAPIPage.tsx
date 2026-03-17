@@ -7,7 +7,7 @@ import CodeBlock from "@/components/CodeBlock";
 import PageNav from "@/components/PageNav";
 import ParamTable from "@/components/ParamTable";
 
-export default function AccountsAPIPage() {
+export default function CategoriesAPIPage() {
 	const locale = useLocale();
 	const t = useTranslations("pages");
 	const ta = useTranslations("api");
@@ -18,29 +18,29 @@ export default function AccountsAPIPage() {
 				items={[
 					{ label: "Develop", href: `/${locale}/develop/getting-started` },
 					{ label: "API Reference" },
-					{ label: t("accounts_api_title").replace(" API", "").replace("API ", "") },
+					{ label: t("categories_api_title").replace(" API", "").replace("API ", "") },
 				]}
 			/>
 
 			<div>
-				<h1 className="text-3xl font-bold text-[#F0EDF5] mb-2">{t("accounts_api_title")}</h1>
-				<p className="text-[#9B8FB8] leading-relaxed">{t("accounts_api_desc")}</p>
+				<h1 className="text-3xl font-bold text-[#F0EDF5] mb-2">{t("categories_api_title")}</h1>
+				<p className="text-[#9B8FB8] leading-relaxed">{t("categories_api_desc")}</p>
 			</div>
 
-			{/* POST /api/v1/accounts */}
+			{/* POST /api/v1/categories */}
 			<div className="space-y-4">
-				<h2 id="create-account" className="text-xl font-semibold text-[#F0EDF5]">
-					{t("create_account")}
+				<h2 id="create-category" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("create_category")}
 				</h2>
 				<ApiEndpoint
 					method="POST"
-					path="/api/v1/accounts"
-					description="Creates a new financial account for a specific user"
+					path="/api/v1/categories"
+					description="Creates a new category. If userId is omitted, it becomes a system category."
 				>
 					<div className="space-y-6">
 						<div>
 							<h3
-								id="create-account-body"
+								id="create-category-body"
 								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
 							>
 								{ta("request_body")}
@@ -50,39 +50,39 @@ export default function AccountsAPIPage() {
 									{
 										name: "userId",
 										type: "string (uuid)",
-										required: true,
-										description: "The UUID of the user who owns this account",
+										required: false,
+										description: "Owner UUID. If omitted, the category becomes a system category",
 									},
 									{
 										name: "name",
 										type: "string",
 										required: true,
-										description: 'Display name for the account (e.g., "Main Checking")',
+										description: 'Display name for the category (e.g., "Food & Dining")',
 									},
 									{
 										name: "type",
 										type: "string (enum)",
 										required: true,
-										description: "The type of financial account",
-										enumValues: ["BANK", "CREDIT", "CRYPTO", "CASH", "INVESTMENT"],
+										description: "The category classification type",
+										enumValues: ["INCOME", "EXPENSE", "TRANSFER"],
 									},
 									{
-										name: "currencyCode",
-										type: "string",
-										required: true,
-										description: "ISO 4217 currency code or crypto symbol (e.g., USD, BTC)",
-									},
-									{
-										name: "initialBalance",
-										type: "number",
-										required: false,
-										description: "Starting balance for the account (default: 0)",
-									},
-									{
-										name: "plaidAccountId",
+										name: "icon",
 										type: "string",
 										required: false,
-										description: "External Plaid account ID for linked accounts",
+										description: 'Icon identifier for the category (e.g., "utensils")',
+									},
+									{
+										name: "color",
+										type: "string",
+										required: false,
+										description: 'Hex color code for the category (e.g., "#FF5733")',
+									},
+									{
+										name: "parentCategoryId",
+										type: "string (uuid)",
+										required: false,
+										description: "Parent category UUID for creating subcategories",
 									},
 								]}
 							/>
@@ -90,7 +90,7 @@ export default function AccountsAPIPage() {
 
 						<div>
 							<h3
-								id="create-account-example"
+								id="create-category-example"
 								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
 							>
 								{ta("example_request")}
@@ -99,29 +99,29 @@ export default function AccountsAPIPage() {
 								tabs={[
 									{
 										label: "cURL",
-										code: `curl -X POST http://localhost:8080/api/v1/accounts \\
+										code: `curl -X POST http://localhost:8080/api/v1/categories \\
   -H "Content-Type: application/json" \\
   -d '{
     "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "name": "Main Checking",
-    "type": "BANK",
-    "currencyCode": "USD",
-    "initialBalance": 5000.00
+    "name": "Food & Dining",
+    "type": "EXPENSE",
+    "icon": "utensils",
+    "color": "#FF5733"
   }'`,
 									},
 									{
 										label: "JavaScript",
-										code: `const response = await fetch("http://localhost:8080/api/v1/accounts", {
+										code: `const response = await fetch("http://localhost:8080/api/v1/categories", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
     userId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    name: "Main Checking",
-    type: "BANK",
-    currencyCode: "USD",
-    initialBalance: 5000.0,
+    name: "Food & Dining",
+    type: "EXPENSE",
+    icon: "utensils",
+    color: "#FF5733",
   }),
 });
 
@@ -133,13 +133,13 @@ console.log(data);`,
 										code: `import requests
 
 response = requests.post(
-    "http://localhost:8080/api/v1/accounts",
+    "http://localhost:8080/api/v1/categories",
     json={
         "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-        "name": "Main Checking",
-        "type": "BANK",
-        "currencyCode": "USD",
-        "initialBalance": 5000.00,
+        "name": "Food & Dining",
+        "type": "EXPENSE",
+        "icon": "utensils",
+        "color": "#FF5733",
     },
 )
 
@@ -151,7 +151,7 @@ print(response.json())`,
 
 						<div>
 							<h3
-								id="create-account-response"
+								id="create-category-response"
 								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
 							>
 								{ta("response")}
@@ -163,20 +163,20 @@ print(response.json())`,
 										label: "JSON",
 										code: `{
   "success": true,
-  "message": "Account created successfully",
+  "message": "Category created successfully",
   "data": {
-    "id": "f7e6d5c4-b3a2-1908-fedc-ba0987654321",
+    "id": "c1d2e3f4-a5b6-7890-cdef-123456789abc",
     "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "name": "Main Checking",
-    "type": "BANK",
-    "currencyCode": "USD",
-    "currentBalance": 5000.00,
-    "plaidAccountId": null,
-    "status": "ACTIVE",
-    "createdAt": "2026-03-15T10:35:00Z",
-    "updatedAt": "2026-03-15T10:35:00Z"
+    "name": "Food & Dining",
+    "type": "EXPENSE",
+    "icon": "utensils",
+    "color": "#FF5733",
+    "isSystem": false,
+    "parentCategoryId": null,
+    "createdAt": "2026-03-15T10:00:00Z",
+    "updatedAt": "2026-03-15T10:00:00Z"
   },
-  "timestamp": "2026-03-15T10:35:00Z"
+  "timestamp": "2026-03-15T10:00:00Z"
 }`,
 									},
 								]}
@@ -186,39 +186,20 @@ print(response.json())`,
 				</ApiEndpoint>
 			</div>
 
-			{/* GET /api/v1/accounts/{accountId} */}
+			{/* GET /api/v1/categories/system */}
 			<div className="space-y-4">
-				<h2 id="get-account-by-id" className="text-xl font-semibold text-[#F0EDF5]">
-					{t("get_by_id")}
+				<h2 id="get-system-categories" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("get_system_categories")}
 				</h2>
 				<ApiEndpoint
 					method="GET"
-					path="/api/v1/accounts/{accountId}"
-					description="Retrieves a specific account by its ID"
+					path="/api/v1/categories/system"
+					description="Retrieves all default system categories available to all users"
 				>
 					<div className="space-y-6">
 						<div>
 							<h3
-								id="get-account-params"
-								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
-							>
-								{ta("path_params")}
-							</h3>
-							<ParamTable
-								params={[
-									{
-										name: "accountId",
-										type: "string (uuid)",
-										required: true,
-										description: "The UUID of the account to retrieve",
-									},
-								]}
-							/>
-						</div>
-
-						<div>
-							<h3
-								id="get-account-example"
+								id="get-system-categories-example"
 								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
 							>
 								{ta("example_request")}
@@ -227,12 +208,12 @@ print(response.json())`,
 								tabs={[
 									{
 										label: "cURL",
-										code: `curl http://localhost:8080/api/v1/accounts/f7e6d5c4-b3a2-1908-fedc-ba0987654321`,
+										code: `curl http://localhost:8080/api/v1/categories/system`,
 									},
 									{
 										label: "JavaScript",
 										code: `const response = await fetch(
-  "http://localhost:8080/api/v1/accounts/f7e6d5c4-b3a2-1908-fedc-ba0987654321"
+  "http://localhost:8080/api/v1/categories/system"
 );
 
 const data = await response.json();
@@ -243,7 +224,7 @@ console.log(data);`,
 										code: `import requests
 
 response = requests.get(
-    "http://localhost:8080/api/v1/accounts/f7e6d5c4-b3a2-1908-fedc-ba0987654321"
+    "http://localhost:8080/api/v1/categories/system"
 )
 
 print(response.json())`,
@@ -254,7 +235,7 @@ print(response.json())`,
 
 						<div>
 							<h3
-								id="get-account-response"
+								id="get-system-categories-response"
 								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
 							>
 								{ta("response")}
@@ -266,20 +247,34 @@ print(response.json())`,
 										label: "JSON",
 										code: `{
   "success": true,
-  "message": "Account retrieved successfully",
-  "data": {
-    "id": "f7e6d5c4-b3a2-1908-fedc-ba0987654321",
-    "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "name": "Main Checking",
-    "type": "BANK",
-    "currencyCode": "USD",
-    "currentBalance": 5000.00,
-    "plaidAccountId": null,
-    "status": "ACTIVE",
-    "createdAt": "2026-03-15T10:35:00Z",
-    "updatedAt": "2026-03-15T10:35:00Z"
-  },
-  "timestamp": "2026-03-15T10:35:00Z"
+  "message": "System categories retrieved successfully",
+  "data": [
+    {
+      "id": "d4e5f6a7-b8c9-0123-def0-456789abcdef",
+      "userId": null,
+      "name": "Food & Dining",
+      "type": "EXPENSE",
+      "icon": "utensils",
+      "color": "#FF5733",
+      "isSystem": true,
+      "parentCategoryId": null,
+      "createdAt": "2026-01-01T00:00:00Z",
+      "updatedAt": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "e5f6a7b8-c9d0-1234-ef01-56789abcdef0",
+      "userId": null,
+      "name": "Salary",
+      "type": "INCOME",
+      "icon": "banknote",
+      "color": "#4CAF50",
+      "isSystem": true,
+      "parentCategoryId": null,
+      "createdAt": "2026-01-01T00:00:00Z",
+      "updatedAt": "2026-01-01T00:00:00Z"
+    }
+  ],
+  "timestamp": "2026-03-15T10:05:00Z"
 }`,
 									},
 								]}
@@ -289,20 +284,20 @@ print(response.json())`,
 				</ApiEndpoint>
 			</div>
 
-			{/* GET /api/v1/accounts/user/{userId} */}
+			{/* GET /api/v1/categories/user/{userId} */}
 			<div className="space-y-4">
-				<h2 id="get-accounts-by-user" className="text-xl font-semibold text-[#F0EDF5]">
-					{t("get_by_user")}
+				<h2 id="get-user-categories" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("get_user_categories")}
 				</h2>
 				<ApiEndpoint
 					method="GET"
-					path="/api/v1/accounts/user/{userId}"
-					description="Retrieves all accounts belonging to a specific user"
+					path="/api/v1/categories/user/{userId}"
+					description="Retrieves all custom categories created by a specific user"
 				>
 					<div className="space-y-6">
 						<div>
 							<h3
-								id="get-user-accounts-params"
+								id="get-user-categories-params"
 								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
 							>
 								{ta("path_params")}
@@ -313,7 +308,7 @@ print(response.json())`,
 										name: "userId",
 										type: "string (uuid)",
 										required: true,
-										description: "The UUID of the user whose accounts to retrieve",
+										description: "The UUID of the user whose categories to retrieve",
 									},
 								]}
 							/>
@@ -321,7 +316,7 @@ print(response.json())`,
 
 						<div>
 							<h3
-								id="get-user-accounts-example"
+								id="get-user-categories-example"
 								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
 							>
 								{ta("example_request")}
@@ -330,12 +325,12 @@ print(response.json())`,
 								tabs={[
 									{
 										label: "cURL",
-										code: `curl http://localhost:8080/api/v1/accounts/user/a1b2c3d4-e5f6-7890-abcd-ef1234567890`,
+										code: `curl http://localhost:8080/api/v1/categories/user/a1b2c3d4-e5f6-7890-abcd-ef1234567890`,
 									},
 									{
 										label: "JavaScript",
 										code: `const response = await fetch(
-  "http://localhost:8080/api/v1/accounts/user/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+  "http://localhost:8080/api/v1/categories/user/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
 );
 
 const data = await response.json();
@@ -346,7 +341,7 @@ console.log(data);`,
 										code: `import requests
 
 response = requests.get(
-    "http://localhost:8080/api/v1/accounts/user/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    "http://localhost:8080/api/v1/categories/user/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
 )
 
 print(response.json())`,
@@ -357,7 +352,7 @@ print(response.json())`,
 
 						<div>
 							<h3
-								id="get-user-accounts-response"
+								id="get-user-categories-response"
 								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
 							>
 								{ta("response")}
@@ -369,34 +364,22 @@ print(response.json())`,
 										label: "JSON",
 										code: `{
   "success": true,
-  "message": "Accounts retrieved successfully",
+  "message": "User categories retrieved successfully",
   "data": [
     {
-      "id": "f7e6d5c4-b3a2-1908-fedc-ba0987654321",
+      "id": "c1d2e3f4-a5b6-7890-cdef-123456789abc",
       "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "name": "Main Checking",
-      "type": "BANK",
-      "currencyCode": "USD",
-      "currentBalance": 5000.00,
-      "plaidAccountId": null,
-      "status": "ACTIVE",
-      "createdAt": "2026-03-15T10:35:00Z",
-      "updatedAt": "2026-03-15T10:35:00Z"
-    },
-    {
-      "id": "e8d7c6b5-a4f3-2109-edcb-af0987654321",
-      "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "name": "Bitcoin Wallet",
-      "type": "CRYPTO",
-      "currencyCode": "BTC",
-      "currentBalance": 0.5,
-      "plaidAccountId": null,
-      "status": "ACTIVE",
-      "createdAt": "2026-03-15T10:40:00Z",
-      "updatedAt": "2026-03-15T10:40:00Z"
+      "name": "Side Hustle",
+      "type": "INCOME",
+      "icon": "briefcase",
+      "color": "#2196F3",
+      "isSystem": false,
+      "parentCategoryId": null,
+      "createdAt": "2026-03-10T08:00:00Z",
+      "updatedAt": "2026-03-10T08:00:00Z"
     }
   ],
-  "timestamp": "2026-03-15T10:45:00Z"
+  "timestamp": "2026-03-15T10:10:00Z"
 }`,
 									},
 								]}
@@ -408,12 +391,12 @@ print(response.json())`,
 
 			<PageNav
 				prev={{
-					label: "Users API",
-					href: `/${locale}/develop/api/users`,
-				}}
-				next={{
 					label: "Transactions API",
 					href: `/${locale}/develop/api/transactions`,
+				}}
+				next={{
+					label: "Notifications API",
+					href: `/${locale}/develop/api/notifications`,
 				}}
 			/>
 		</div>

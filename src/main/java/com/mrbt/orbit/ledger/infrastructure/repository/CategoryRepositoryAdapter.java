@@ -1,5 +1,6 @@
 package com.mrbt.orbit.ledger.infrastructure.repository;
 
+import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.ledger.core.model.Category;
 import com.mrbt.orbit.ledger.core.port.out.CategoryRepositoryPort;
 import com.mrbt.orbit.ledger.infrastructure.entity.CategoryEntity;
@@ -22,6 +23,14 @@ public class CategoryRepositoryAdapter implements CategoryRepositoryPort {
 	@Override
 	public Category save(Category category) {
 		CategoryEntity entity = mapper.toEntity(category);
+
+		// Resolve parent category relationship
+		if (category.getParentCategoryId() != null) {
+			CategoryEntity parent = springDataRepository.findById(category.getParentCategoryId())
+					.orElseThrow(() -> new ResourceNotFoundException("Category", "ID", category.getParentCategoryId()));
+			entity.setParentCategory(parent);
+		}
+
 		CategoryEntity savedEntity = springDataRepository.save(entity);
 		return mapper.toDomain(savedEntity);
 	}

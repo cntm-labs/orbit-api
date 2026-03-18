@@ -1,6 +1,7 @@
 package com.mrbt.orbit.ledger.api;
 
 import com.mrbt.orbit.common.api.ApiResponse;
+import com.mrbt.orbit.common.core.model.PageResult;
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.ledger.api.request.CreateTransactionRequest;
 import com.mrbt.orbit.ledger.api.response.TransactionResponse;
@@ -16,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -51,11 +51,14 @@ public class TransactionController {
 	}
 
 	@GetMapping("/account/{accountId}")
-	@Operation(summary = "Get transactions for an account", description = "Retrieves the ledger history for a specific account")
-	public ResponseEntity<ApiResponse<List<TransactionResponse>>> getTransactionsByAccountId(
-			@PathVariable UUID accountId) {
-		List<Transaction> transactions = getTransactionUseCase.getTransactionsByAccountId(accountId);
-		List<TransactionResponse> responses = transactionMapper.toResponseList(transactions);
+	@Operation(summary = "Get transactions for an account", description = "Retrieves the paginated ledger history for a specific account, newest first")
+	public ResponseEntity<ApiResponse<PageResult<TransactionResponse>>> getTransactionsByAccountId(
+			@PathVariable UUID accountId, @RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "20") int size) {
+		int cappedSize = Math.min(size, 100);
+		PageResult<Transaction> result = getTransactionUseCase.getTransactionsByAccountId(accountId, page, cappedSize);
+		PageResult<TransactionResponse> responses = new PageResult<>(transactionMapper.toResponseList(result.content()),
+				result.totalElements(), result.totalPages(), result.page(), result.size());
 
 		return ResponseEntity.ok(ApiResponse.success(responses));
 	}

@@ -1,6 +1,8 @@
 package com.mrbt.orbit.ledger.api;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,6 +25,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mrbt.orbit.common.core.model.PageResult;
 import com.mrbt.orbit.ledger.api.request.CreateTransactionRequest;
 import com.mrbt.orbit.ledger.core.model.Transaction;
 import com.mrbt.orbit.ledger.core.model.enums.TransactionStatus;
@@ -90,15 +93,28 @@ class TransactionControllerTest {
 	}
 
 	@Test
-	void getTransactionsByAccountId_returns200() throws Exception {
+	void getTransactionsByAccountId_returnsPage() throws Exception {
 		UUID accountId = UUID.randomUUID();
-		List<Transaction> txs = List.of(Transaction.builder().id(UUID.randomUUID()).accountId(accountId)
-				.amount(new BigDecimal("10")).status(TransactionStatus.COMPLETED).build());
+		Transaction tx = Transaction.builder().id(UUID.randomUUID()).accountId(accountId).amount(new BigDecimal("10"))
+				.status(TransactionStatus.COMPLETED).build();
+		PageResult<Transaction> page = new PageResult<>(List.of(tx), 1L, 1, 0, 20);
 
-		when(getTransactionUseCase.getTransactionsByAccountId(accountId)).thenReturn(txs);
+		when(getTransactionUseCase.getTransactionsByAccountId(eq(accountId), anyInt(), anyInt())).thenReturn(page);
 
 		mockMvc.perform(get("/api/v1/transactions/account/{accountId}", accountId)).andExpect(status().isOk())
-				.andExpect(jsonPath("$.data").isArray());
+				.andExpect(jsonPath("$.success").value(true)).andExpect(jsonPath("$.data.content").isArray())
+				.andExpect(jsonPath("$.data.totalElements").value(1)).andExpect(jsonPath("$.data.page").value(0))
+				.andExpect(jsonPath("$.data.size").value(20));
+	}
+
+	@Test
+	void getTransactionsByAccountId_capsSizeAt100() throws Exception {
+		UUID accountId = UUID.randomUUID();
+		PageResult<Transaction> page = new PageResult<>(List.of(), 0L, 0, 0, 100);
+
+		when(getTransactionUseCase.getTransactionsByAccountId(eq(accountId), eq(0), eq(100))).thenReturn(page);
+
+		mockMvc.perform(get("/api/v1/transactions/account/{accountId}?size=999", accountId)).andExpect(status().isOk());
 	}
 
 }

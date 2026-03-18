@@ -16,6 +16,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
+import com.mrbt.orbit.common.core.model.PageResult;
 
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.ledger.core.model.Transaction;
@@ -123,15 +127,19 @@ class TransactionRepositoryAdapterTest {
 	}
 
 	@Test
-	void findByAccountId_returnsList() {
+	void findByAccountId_returnsPageResult() {
 		UUID accountId = UUID.randomUUID();
 		TransactionEntity entity = new TransactionEntity();
 		Transaction mapped = Transaction.builder().id(UUID.randomUUID()).build();
 
-		when(springDataRepository.findByAccount_Id(accountId)).thenReturn(List.of(entity));
+		when(springDataRepository.findByAccount_Id(eq(accountId), any(Pageable.class)))
+				.thenReturn(new PageImpl<>(List.of(entity)));
 		when(mapper.toDomain(entity)).thenReturn(mapped);
 
-		assertThat(adapter.findByAccountId(accountId)).hasSize(1);
+		PageResult<Transaction> result = adapter.findByAccountId(accountId, 0, 20);
+
+		assertThat(result.content()).hasSize(1);
+		assertThat(result.totalElements()).isEqualTo(1L);
 	}
 
 }

@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.mrbt.orbit.common.core.model.PageResult;
 import com.mrbt.orbit.ledger.core.model.Transaction;
 import com.mrbt.orbit.ledger.core.port.out.TransactionRepositoryPort;
 
@@ -49,17 +50,21 @@ class GetTransactionServiceTest {
 	}
 
 	@Test
-	void getTransactionsByAccountId_returnsList() {
+	void getTransactionsByAccountId_returnsPageResult() {
 		UUID accountId = UUID.randomUUID();
 		List<Transaction> txs = List.of(Transaction.builder().amount(new BigDecimal("10")).build(),
 				Transaction.builder().amount(new BigDecimal("20")).build());
+		PageResult<Transaction> page = new PageResult<>(txs, 2L, 1, 0, 20);
 
-		when(transactionRepositoryPort.findByAccountId(accountId)).thenReturn(txs);
+		when(transactionRepositoryPort.findByAccountId(accountId, 0, 20)).thenReturn(page);
 
-		List<Transaction> result = getTransactionService.getTransactionsByAccountId(accountId);
+		PageResult<Transaction> result = getTransactionService.getTransactionsByAccountId(accountId, 0, 20);
 
-		assertThat(result).hasSize(2);
-		verify(transactionRepositoryPort).findByAccountId(accountId);
+		assertThat(result.content()).hasSize(2);
+		assertThat(result.totalElements()).isEqualTo(2L);
+		assertThat(result.page()).isEqualTo(0);
+		assertThat(result.size()).isEqualTo(20);
+		verify(transactionRepositoryPort).findByAccountId(accountId, 0, 20);
 	}
 
 }

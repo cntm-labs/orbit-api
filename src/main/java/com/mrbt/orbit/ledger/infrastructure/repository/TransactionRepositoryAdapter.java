@@ -1,5 +1,6 @@
 package com.mrbt.orbit.ledger.infrastructure.repository;
 
+import com.mrbt.orbit.common.core.model.PageResult;
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.ledger.core.model.Transaction;
 import com.mrbt.orbit.ledger.core.port.out.TransactionRepositoryPort;
@@ -8,12 +9,13 @@ import com.mrbt.orbit.ledger.infrastructure.entity.CategoryEntity;
 import com.mrbt.orbit.ledger.infrastructure.entity.TransactionEntity;
 import com.mrbt.orbit.ledger.infrastructure.mapper.TransactionMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -46,8 +48,12 @@ public class TransactionRepositoryAdapter implements TransactionRepositoryPort {
 	}
 
 	@Override
-	public List<Transaction> findByAccountId(UUID accountId) {
-		return springDataRepository.findByAccount_Id(accountId).stream().map(mapper::toDomain)
-				.collect(Collectors.toList());
+	public PageResult<Transaction> findByAccountId(UUID accountId, int page, int size) {
+		PageRequest pageRequest = PageRequest.of(page, size, Sort.by("transactionDate").descending());
+		Page<TransactionEntity> entityPage = springDataRepository.findByAccount_Id(accountId, pageRequest);
+
+		return new PageResult<>(entityPage.getContent().stream().map(mapper::toDomain).toList(),
+				entityPage.getTotalElements(), entityPage.getTotalPages(), entityPage.getNumber(),
+				entityPage.getSize());
 	}
 }

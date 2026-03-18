@@ -132,14 +132,15 @@ Create `.claude/settings.local.json`:
 ```json
 {
   "hooks": {
-    "PostWrite": [
+    "PostToolUse": [
       {
-        "matcher": "docs/**/*.{ts,tsx,js,jsx}",
-        "command": "cd docs && bunx biome check --write \"$CLAUDE_FILE_PATH\""
-      },
-      {
-        "matcher": "src/**/*.java",
-        "command": "./mvnw spotless:apply -q"
+        "matcher": "WriteFile|EditFile|Replace",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=$(jq -r '.tool_input.file_path' 2>/dev/null); if [[ \"$file\" =~ ^docs/.*\\.(ts|tsx|js|jsx)$ ]]; then (cd docs && bunx biome check --write \"${file#docs/}\"); elif [[ \"$file\" =~ ^src/.*\\.java$ ]]; then ./mvnw spotless:apply -q; fi"
+          }
+        ]
       }
     ]
   }
@@ -151,9 +152,9 @@ Create `.claude/settings.local.json`:
 Add the following section to `CLAUDE.md` after the "AI Agent Hooks" section:
 
 ```markdown
-## Code Quality Hooks (PostWrite Auto-Fix)
+## Code Quality Hooks (PostToolUse Auto-Fix)
 
-Claude Code PostWrite hooks auto-run on every file write:
+Claude Code PostToolUse hooks auto-run on every file write:
 - **JS/TS files** (`docs/**/*.{ts,tsx,js,jsx}`) → `biome check --write` (format + lint fix)
 - **Java files** (`src/**/*.java`) → `./mvnw spotless:apply` (Eclipse JDT format)
 

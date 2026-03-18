@@ -85,9 +85,9 @@ Cross-cutting concerns live in `common/` and `config/`.
 - **Documentation Verification:** `scripts/verify-docs.sh` ensures no endpoint is merged undocumented
 - **Dependabot:** Weekly automated dependency updates
 
-## Code Quality Hooks (PostWrite Auto-Fix)
+## Code Quality Hooks (PostToolUse Auto-Fix)
 
-Claude Code PostWrite hooks auto-run on every file write:
+Claude Code PostToolUse hooks auto-run on every file write:
 - **JS/TS files** (`docs/**/*.{ts,tsx,js,jsx}`) → `biome check --write` (format + lint fix)
 - **Java files** (`src/**/*.java`) → `./mvnw spotless:apply` (Eclipse JDT format)
 

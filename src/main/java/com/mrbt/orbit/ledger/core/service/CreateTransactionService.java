@@ -4,10 +4,12 @@ import com.mrbt.orbit.common.exception.BadRequestException;
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.ledger.core.model.Transaction;
 import com.mrbt.orbit.ledger.core.model.enums.TransactionStatus;
+import com.mrbt.orbit.ledger.core.model.TransactionCreatedEvent;
 import com.mrbt.orbit.ledger.core.port.in.CreateTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.out.AccountRepositoryPort;
 import com.mrbt.orbit.ledger.core.port.out.TransactionRepositoryPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ public class CreateTransactionService implements CreateTransactionUseCase {
 
 	private final TransactionRepositoryPort transactionRepositoryPort;
 	private final AccountRepositoryPort accountRepositoryPort;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Override
 	@Transactional
@@ -55,6 +58,13 @@ public class CreateTransactionService implements CreateTransactionUseCase {
 		}
 
 		// 5. Save the transaction log
-		return transactionRepositoryPort.save(transaction);
+		Transaction saved = transactionRepositoryPort.save(transaction);
+
+		if (saved.getCategoryId() != null && saved.getStatus() == TransactionStatus.COMPLETED) {
+			eventPublisher.publishEvent(
+					new TransactionCreatedEvent(saved.getCategoryId(), saved.getAmount(), saved.getTransactionDate()));
+		}
+
+		return saved;
 	}
 }

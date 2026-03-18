@@ -160,8 +160,8 @@ export default function ArchitecturePage() {
 
 			<PageNav
 				prev={{
-					label: "Accounts API",
-					href: `/${locale}/develop/api/accounts`,
+					label: "Goals API",
+					href: `/${locale}/develop/api/goals`,
 				}}
 				next={{
 					label: "Quick Start",

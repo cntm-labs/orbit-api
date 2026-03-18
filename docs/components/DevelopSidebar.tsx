@@ -7,8 +7,10 @@ import {
 	Database,
 	Hexagon,
 	Key,
+	PiggyBank,
 	Rocket,
 	Tag,
+	Target,
 	User,
 	Wallet,
 } from "lucide-react";
@@ -125,6 +127,28 @@ export default function DevelopSidebar({ locale, mobile }: { locale: string; mob
 				{ method: "PUT", label: "Mark All Read", href: `/${locale}/develop/api/notifications` },
 			],
 		},
+		{
+			icon: PiggyBank,
+			label: t("budgets"),
+			basePath: `/${locale}/develop/api/budgets`,
+			items: [
+				{ method: "POST", label: "Create Budget", href: `/${locale}/develop/api/budgets` },
+				{ method: "GET", label: "Get Budget", href: `/${locale}/develop/api/budgets` },
+				{ method: "GET", label: "User Budgets", href: `/${locale}/develop/api/budgets` },
+				{ method: "PATCH", label: "Archive", href: `/${locale}/develop/api/budgets` },
+			],
+		},
+		{
+			icon: Target,
+			label: t("goals"),
+			basePath: `/${locale}/develop/api/goals`,
+			items: [
+				{ method: "POST", label: "Create Goal", href: `/${locale}/develop/api/goals` },
+				{ method: "GET", label: "Get Goal", href: `/${locale}/develop/api/goals` },
+				{ method: "GET", label: "User Goals", href: `/${locale}/develop/api/goals` },
+				{ method: "PATCH", label: "Contribute", href: `/${locale}/develop/api/goals` },
+			],
+		},
 	];
 
 	return (
@@ -163,16 +187,7 @@ export default function DevelopSidebar({ locale, mobile }: { locale: string; mob
 							<CollapsibleSection key={section.basePath} {...section} pathname={pathname} />
 						))}
 
-						{/* Disabled items */}
-						<SidebarLink
-							href="#"
-							icon={CreditCard}
-							label={t("payments")}
-							active={false}
-							disabled
-							badge={t("soon")}
-						/>
-					</div>
+						</div>
 				</div>
 
 				{/* Architecture */}

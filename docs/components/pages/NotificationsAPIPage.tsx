@@ -460,8 +460,8 @@ print(response.json())`,
 					href: `/${locale}/develop/api/categories`,
 				}}
 				next={{
-					label: "Architecture",
-					href: `/${locale}/develop/architecture`,
+					label: "Budgets API",
+					href: `/${locale}/develop/api/budgets`,
 				}}
 			/>
 		</div>

@@ -3,7 +3,9 @@ package com.mrbt.orbit.budget.api;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,11 +32,14 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mrbt.orbit.budget.api.mapper.GoalDtoMapper;
 import com.mrbt.orbit.budget.api.request.ContributeGoalRequest;
 import com.mrbt.orbit.budget.api.request.CreateGoalRequest;
+import com.mrbt.orbit.budget.api.request.UpdateGoalRequest;
 import com.mrbt.orbit.budget.core.model.Goal;
 import com.mrbt.orbit.budget.core.model.enums.GoalStatus;
 import com.mrbt.orbit.budget.core.port.in.ContributeGoalUseCase;
 import com.mrbt.orbit.budget.core.port.in.CreateGoalUseCase;
+import com.mrbt.orbit.budget.core.port.in.DeleteGoalUseCase;
 import com.mrbt.orbit.budget.core.port.in.GetGoalUseCase;
+import com.mrbt.orbit.budget.core.port.in.UpdateGoalUseCase;
 import com.mrbt.orbit.common.core.model.PageResult;
 
 @WebMvcTest(GoalController.class)
@@ -55,6 +60,12 @@ class GoalControllerTest {
 
 	@MockitoBean
 	private ContributeGoalUseCase contributeGoalUseCase;
+
+	@MockitoBean
+	private UpdateGoalUseCase updateGoalUseCase;
+
+	@MockitoBean
+	private DeleteGoalUseCase deleteGoalUseCase;
 
 	@Test
 	void createGoal_returns201() throws Exception {
@@ -128,6 +139,30 @@ class GoalControllerTest {
 		mockMvc.perform(patch("/api/v1/goals/{goalId}/contribute", goalId).contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request))).andExpect(status().isOk())
 				.andExpect(jsonPath("$.success").value(true)).andExpect(jsonPath("$.data.name").value("Vacation"));
+	}
+
+	@Test
+	void updateGoal_returns200() throws Exception {
+		UUID goalId = UUID.randomUUID();
+		Goal updated = Goal.builder().id(goalId).userId(UUID.randomUUID()).name("Updated Goal")
+				.targetAmount(new BigDecimal("5000")).currentAmount(BigDecimal.ZERO).status(GoalStatus.IN_PROGRESS)
+				.build();
+
+		when(updateGoalUseCase.updateGoal(eq(goalId), eq("Updated Goal"), isNull(), isNull())).thenReturn(updated);
+
+		UpdateGoalRequest request = UpdateGoalRequest.builder().name("Updated Goal").build();
+
+		mockMvc.perform(patch("/api/v1/goals/{goalId}", goalId).contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request))).andExpect(status().isOk())
+				.andExpect(jsonPath("$.success").value(true)).andExpect(jsonPath("$.data.name").value("Updated Goal"));
+	}
+
+	@Test
+	void deleteGoal_returns200() throws Exception {
+		UUID goalId = UUID.randomUUID();
+
+		mockMvc.perform(delete("/api/v1/goals/{goalId}", goalId)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.success").value(true));
 	}
 
 }

@@ -1,8 +1,12 @@
 package com.mrbt.orbit.security.api;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,10 +25,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mrbt.orbit.security.api.request.CreateUserRequest;
+import com.mrbt.orbit.security.api.request.UpdateUserRequest;
 import com.mrbt.orbit.security.core.model.User;
 import com.mrbt.orbit.security.core.model.enums.UserStatus;
 import com.mrbt.orbit.security.core.port.in.CreateUserUseCase;
+import com.mrbt.orbit.security.core.port.in.DeleteUserUseCase;
 import com.mrbt.orbit.security.core.port.in.GetUserUseCase;
+import com.mrbt.orbit.security.core.port.in.UpdateUserUseCase;
 import com.mrbt.orbit.security.infrastructure.mapper.UserMapper;
 
 @WebMvcTest(UserController.class)
@@ -42,6 +49,12 @@ class UserControllerTest {
 
 	@MockitoBean
 	private GetUserUseCase getUserUseCase;
+
+	@MockitoBean
+	private UpdateUserUseCase updateUserUseCase;
+
+	@MockitoBean
+	private DeleteUserUseCase deleteUserUseCase;
 
 	@Test
 	void registerUser_returns201() throws Exception {
@@ -79,6 +92,29 @@ class UserControllerTest {
 		when(getUserUseCase.getUserByClerkId("nonexistent")).thenReturn(Optional.empty());
 
 		mockMvc.perform(get("/api/v1/users/clerk/{clerkUserId}", "nonexistent")).andExpect(status().isNotFound());
+	}
+
+	@Test
+	void updateUser_returns200() throws Exception {
+		UUID userId = UUID.randomUUID();
+		User updated = User.builder().id(userId).firstName("Jane").lastName("Doe").email("jane@test.com")
+				.status(UserStatus.ACTIVE).build();
+
+		when(updateUserUseCase.updateUser(eq(userId), eq("Jane"), isNull(), isNull(), isNull())).thenReturn(updated);
+
+		UpdateUserRequest request = UpdateUserRequest.builder().firstName("Jane").build();
+
+		mockMvc.perform(patch("/api/v1/users/{userId}", userId).contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request))).andExpect(status().isOk())
+				.andExpect(jsonPath("$.success").value(true)).andExpect(jsonPath("$.data.firstName").value("Jane"));
+	}
+
+	@Test
+	void deleteUser_returns200() throws Exception {
+		UUID userId = UUID.randomUUID();
+
+		mockMvc.perform(delete("/api/v1/users/{userId}", userId)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.success").value(true));
 	}
 
 }

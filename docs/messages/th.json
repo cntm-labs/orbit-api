@@ -136,7 +136,19 @@
 		"create_goal": "สร้างเป้าหมาย",
 		"get_goal_by_id": "ดึงข้อมูลเป้าหมายตาม ID",
 		"get_goals_by_user": "ดึงข้อมูลเป้าหมายของผู้ใช้",
-		"contribute_to_goal": "เพิ่มเงินเข้าเป้าหมาย"
+		"contribute_to_goal": "เพิ่มเงินเข้าเป้าหมาย",
+		"update_user": "อัปเดตโปรไฟล์ผู้ใช้",
+		"delete_user": "ปิดใช้งานผู้ใช้",
+		"update_account": "อัปเดตบัญชี",
+		"delete_account": "ลบบัญชี",
+		"update_transaction": "อัปเดตธุรกรรม",
+		"void_transaction": "ยกเลิกธุรกรรม",
+		"update_category": "อัปเดตหมวดหมู่",
+		"delete_category": "ลบหมวดหมู่",
+		"update_budget": "อัปเดตงบประมาณ",
+		"delete_budget": "ลบงบประมาณ",
+		"update_goal": "อัปเดตเป้าหมาย",
+		"cancel_goal": "ยกเลิกเป้าหมาย"
 	},
 	"common": {
 		"previous": "ก่อนหน้า",

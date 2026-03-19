@@ -3,8 +3,11 @@ package com.mrbt.orbit.ledger.api;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -27,10 +30,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mrbt.orbit.common.core.model.PageResult;
 import com.mrbt.orbit.ledger.api.request.CreateTransactionRequest;
+import com.mrbt.orbit.ledger.api.request.UpdateTransactionRequest;
 import com.mrbt.orbit.ledger.core.model.Transaction;
 import com.mrbt.orbit.ledger.core.model.enums.TransactionStatus;
 import com.mrbt.orbit.ledger.core.port.in.CreateTransactionUseCase;
+import com.mrbt.orbit.ledger.core.port.in.DeleteTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.GetTransactionUseCase;
+import com.mrbt.orbit.ledger.core.port.in.UpdateTransactionUseCase;
 import com.mrbt.orbit.ledger.infrastructure.mapper.TransactionMapper;
 
 @WebMvcTest(TransactionController.class)
@@ -48,6 +54,12 @@ class TransactionControllerTest {
 
 	@MockitoBean
 	private GetTransactionUseCase getTransactionUseCase;
+
+	@MockitoBean
+	private UpdateTransactionUseCase updateTransactionUseCase;
+
+	@MockitoBean
+	private DeleteTransactionUseCase deleteTransactionUseCase;
 
 	@Test
 	void createTransaction_returns201() throws Exception {
@@ -115,6 +127,31 @@ class TransactionControllerTest {
 		when(getTransactionUseCase.getTransactionsByAccountId(eq(accountId), eq(0), eq(100))).thenReturn(page);
 
 		mockMvc.perform(get("/api/v1/transactions/account/{accountId}?size=999", accountId)).andExpect(status().isOk());
+	}
+
+	@Test
+	void updateTransaction_returns200() throws Exception {
+		UUID txId = UUID.randomUUID();
+		Transaction updated = Transaction.builder().id(txId).accountId(UUID.randomUUID()).amount(new BigDecimal("50"))
+				.description("Updated Desc").status(TransactionStatus.COMPLETED).isReviewed(false).build();
+
+		when(updateTransactionUseCase.updateTransaction(eq(txId), eq("Updated Desc"), isNull(), isNull()))
+				.thenReturn(updated);
+
+		UpdateTransactionRequest request = UpdateTransactionRequest.builder().description("Updated Desc").build();
+
+		mockMvc.perform(patch("/api/v1/transactions/{transactionId}", txId).contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request))).andExpect(status().isOk())
+				.andExpect(jsonPath("$.success").value(true))
+				.andExpect(jsonPath("$.data.description").value("Updated Desc"));
+	}
+
+	@Test
+	void deleteTransaction_returns200() throws Exception {
+		UUID txId = UUID.randomUUID();
+
+		mockMvc.perform(delete("/api/v1/transactions/{transactionId}", txId)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.success").value(true));
 	}
 
 }

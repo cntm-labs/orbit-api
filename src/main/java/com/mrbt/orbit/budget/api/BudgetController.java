@@ -2,11 +2,13 @@ package com.mrbt.orbit.budget.api;
 
 import com.mrbt.orbit.budget.api.mapper.BudgetDtoMapper;
 import com.mrbt.orbit.budget.api.request.CreateBudgetRequest;
+import com.mrbt.orbit.budget.api.request.UpdateBudgetRequest;
 import com.mrbt.orbit.budget.api.response.BudgetResponse;
 import com.mrbt.orbit.budget.core.model.Budget;
 import com.mrbt.orbit.budget.core.port.in.ArchiveBudgetUseCase;
 import com.mrbt.orbit.budget.core.port.in.CreateBudgetUseCase;
 import com.mrbt.orbit.budget.core.port.in.GetBudgetUseCase;
+import com.mrbt.orbit.budget.core.port.in.UpdateBudgetUseCase;
 import com.mrbt.orbit.common.api.ApiResponse;
 import com.mrbt.orbit.common.api.PaginationParams;
 import com.mrbt.orbit.common.core.model.PageResult;
@@ -30,6 +32,7 @@ public class BudgetController {
 	private final CreateBudgetUseCase createBudgetUseCase;
 	private final GetBudgetUseCase getBudgetUseCase;
 	private final ArchiveBudgetUseCase archiveBudgetUseCase;
+	private final UpdateBudgetUseCase updateBudgetUseCase;
 	private final BudgetDtoMapper dtoMapper;
 
 	@PostMapping
@@ -63,6 +66,21 @@ public class BudgetController {
 	@PatchMapping("/{budgetId}/archive")
 	@Operation(summary = "Archive a budget", description = "Sets budget status to ARCHIVED")
 	public ResponseEntity<ApiResponse<Void>> archiveBudget(@PathVariable UUID budgetId) {
+		archiveBudgetUseCase.archiveBudget(budgetId);
+		return ResponseEntity.ok(ApiResponse.success("Budget archived", null));
+	}
+
+	@PatchMapping("/{budgetId}")
+	@Operation(summary = "Update a budget", description = "Partially updates budget fields")
+	public ResponseEntity<ApiResponse<BudgetResponse>> updateBudget(@PathVariable UUID budgetId,
+			@Valid @RequestBody UpdateBudgetRequest request) {
+		Budget updated = updateBudgetUseCase.updateBudget(budgetId, request.name());
+		return ResponseEntity.ok(ApiResponse.success("Budget updated", dtoMapper.toResponse(updated)));
+	}
+
+	@DeleteMapping("/{budgetId}")
+	@Operation(summary = "Delete a budget", description = "Soft deletes a budget by archiving it")
+	public ResponseEntity<ApiResponse<Void>> deleteBudget(@PathVariable UUID budgetId) {
 		archiveBudgetUseCase.archiveBudget(budgetId);
 		return ResponseEntity.ok(ApiResponse.success("Budget archived", null));
 	}

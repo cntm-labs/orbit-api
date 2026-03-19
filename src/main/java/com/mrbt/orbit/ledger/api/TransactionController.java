@@ -5,10 +5,13 @@ import com.mrbt.orbit.common.api.PaginationParams;
 import com.mrbt.orbit.common.core.model.PageResult;
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.ledger.api.request.CreateTransactionRequest;
+import com.mrbt.orbit.ledger.api.request.UpdateTransactionRequest;
 import com.mrbt.orbit.ledger.api.response.TransactionResponse;
 import com.mrbt.orbit.ledger.core.model.Transaction;
 import com.mrbt.orbit.ledger.core.port.in.CreateTransactionUseCase;
+import com.mrbt.orbit.ledger.core.port.in.DeleteTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.GetTransactionUseCase;
+import com.mrbt.orbit.ledger.core.port.in.UpdateTransactionUseCase;
 import com.mrbt.orbit.ledger.infrastructure.mapper.TransactionMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,6 +31,8 @@ public class TransactionController {
 
 	private final CreateTransactionUseCase createTransactionUseCase;
 	private final GetTransactionUseCase getTransactionUseCase;
+	private final UpdateTransactionUseCase updateTransactionUseCase;
+	private final DeleteTransactionUseCase deleteTransactionUseCase;
 	private final TransactionMapper transactionMapper;
 
 	@PostMapping
@@ -63,5 +68,21 @@ public class TransactionController {
 				result.totalElements(), result.totalPages(), result.page(), result.size());
 
 		return ResponseEntity.ok(ApiResponse.success(responses));
+	}
+
+	@PatchMapping("/{transactionId}")
+	@Operation(summary = "Update a transaction", description = "Partially updates transaction fields")
+	public ResponseEntity<ApiResponse<TransactionResponse>> updateTransaction(@PathVariable UUID transactionId,
+			@Valid @RequestBody UpdateTransactionRequest request) {
+		Transaction updated = updateTransactionUseCase.updateTransaction(transactionId, request.description(),
+				request.categoryId(), request.isReviewed());
+		return ResponseEntity.ok(ApiResponse.success("Transaction updated", transactionMapper.toResponse(updated)));
+	}
+
+	@DeleteMapping("/{transactionId}")
+	@Operation(summary = "Void a transaction", description = "Soft deletes a transaction by setting status to VOIDED and reversing the balance")
+	public ResponseEntity<ApiResponse<Void>> deleteTransaction(@PathVariable UUID transactionId) {
+		deleteTransactionUseCase.voidTransaction(transactionId);
+		return ResponseEntity.ok(ApiResponse.success("Transaction voided", null));
 	}
 }

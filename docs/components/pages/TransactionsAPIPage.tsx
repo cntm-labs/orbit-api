@@ -412,6 +412,251 @@ print(response.json())`,
 				</ApiEndpoint>
 			</div>
 
+			{/* PATCH /api/v1/transactions/{transactionId} */}
+			<div className="space-y-4">
+				<h2 id="update-transaction" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("update_transaction")}
+				</h2>
+				<ApiEndpoint
+					method="PATCH"
+					path="/api/v1/transactions/{transactionId}"
+					description="Updates mutable fields of an existing transaction"
+				>
+					<div className="space-y-6">
+						<div>
+							<h3
+								id="update-transaction-params"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("path_params")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "transactionId",
+										type: "string (uuid)",
+										required: true,
+										description: "The UUID of the transaction to update",
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="update-transaction-body"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("request_body")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "categoryId",
+										type: "string (uuid)",
+										required: false,
+										description: "Updated category UUID",
+									},
+									{
+										name: "description",
+										type: "string",
+										required: false,
+										description: "Updated description",
+									},
+									{
+										name: "isReviewed",
+										type: "boolean",
+										required: false,
+										description: "Mark the transaction as reviewed",
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="update-transaction-example"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("example_request")}
+							</h3>
+							<CodeBlock
+								tabs={[
+									{
+										label: "cURL",
+										code: `curl -X PATCH http://localhost:8080/api/v1/transactions/a1b2c3d4-e5f6-7890-abcd-ef1234567890 \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "description": "Weekly grocery shopping",
+    "isReviewed": true
+  }'`,
+									},
+									{
+										label: "JavaScript",
+										code: `const response = await fetch(
+  "http://localhost:8080/api/v1/transactions/a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      description: "Weekly grocery shopping",
+      isReviewed: true,
+    }),
+  }
+);
+
+const data = await response.json();
+console.log(data);`,
+									},
+									{
+										label: "Python",
+										code: `import requests
+
+response = requests.patch(
+    "http://localhost:8080/api/v1/transactions/a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    json={
+        "description": "Weekly grocery shopping",
+        "isReviewed": True,
+    },
+)
+
+print(response.json())`,
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="update-transaction-response"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("response")}
+							</h3>
+							<CodeBlock
+								response
+								tabs={[
+									{
+										label: "JSON",
+										code: `{
+  "success": true,
+  "message": "Transaction updated successfully",
+  "data": {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "accountId": "f7e6d5c4-b3a2-1908-fedc-ba0987654321",
+    "categoryId": "c1d2e3f4-a5b6-7890-cdef-123456789abc",
+    "amount": -45.50,
+    "currencyCode": "USD",
+    "exchangeRate": null,
+    "description": "Weekly grocery shopping",
+    "transactionDate": "2026-03-15T14:30:00Z",
+    "status": "COMPLETED",
+    "isReviewed": true,
+    "createdAt": "2026-03-15T14:30:00Z"
+  },
+  "timestamp": "2026-03-15T15:00:00Z"
+}`,
+									},
+								]}
+							/>
+						</div>
+					</div>
+				</ApiEndpoint>
+			</div>
+
+			{/* DELETE /api/v1/transactions/{transactionId} */}
+			<div className="space-y-4">
+				<h2 id="void-transaction" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("void_transaction")}
+				</h2>
+				<ApiEndpoint
+					method="DELETE"
+					path="/api/v1/transactions/{transactionId}"
+					description="Voids a transaction, reversing its effect on the account balance. The transaction status is set to VOIDED."
+				>
+					<div className="space-y-6">
+						<div>
+							<h3
+								id="void-transaction-params"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("path_params")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "transactionId",
+										type: "string (uuid)",
+										required: true,
+										description: "The UUID of the transaction to void",
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="void-transaction-example"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("example_request")}
+							</h3>
+							<CodeBlock
+								tabs={[
+									{
+										label: "cURL",
+										code: `curl -X DELETE http://localhost:8080/api/v1/transactions/a1b2c3d4-e5f6-7890-abcd-ef1234567890`,
+									},
+									{
+										label: "JavaScript",
+										code: `const response = await fetch(
+  "http://localhost:8080/api/v1/transactions/a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  { method: "DELETE" }
+);
+
+const data = await response.json();
+console.log(data);`,
+									},
+									{
+										label: "Python",
+										code: `import requests
+
+response = requests.delete(
+    "http://localhost:8080/api/v1/transactions/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+)
+
+print(response.json())`,
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="void-transaction-response"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("response")}
+							</h3>
+							<CodeBlock
+								response
+								tabs={[
+									{
+										label: "JSON",
+										code: `{
+  "success": true,
+  "message": "Transaction voided successfully",
+  "data": null,
+  "timestamp": "2026-03-15T15:05:00Z"
+}`,
+									},
+								]}
+							/>
+						</div>
+					</div>
+				</ApiEndpoint>
+			</div>
+
 			<PageNav
 				prev={{
 					label: "Accounts API",

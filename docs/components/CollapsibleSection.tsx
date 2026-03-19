@@ -24,6 +24,8 @@ const METHOD_COLORS: Record<string, string> = {
 	GET: "bg-[#5DFDCB]/15 text-[#5DFDCB]",
 	POST: "bg-[#B07AFF]/15 text-[#B07AFF]",
 	PUT: "bg-[#FFB74D]/15 text-[#FFB74D]",
+	PATCH: "bg-[#FFB74D]/15 text-[#FFB74D]",
+	DELETE: "bg-[#FF5252]/15 text-[#FF5252]",
 };
 
 function MethodBadge({ method }: { method: string }) {

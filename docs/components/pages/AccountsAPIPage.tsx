@@ -406,6 +406,237 @@ print(response.json())`,
 				</ApiEndpoint>
 			</div>
 
+			{/* PATCH /api/v1/accounts/{accountId} */}
+			<div className="space-y-4">
+				<h2 id="update-account" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("update_account")}
+				</h2>
+				<ApiEndpoint
+					method="PATCH"
+					path="/api/v1/accounts/{accountId}"
+					description="Updates an existing account's mutable fields"
+				>
+					<div className="space-y-6">
+						<div>
+							<h3
+								id="update-account-params"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("path_params")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "accountId",
+										type: "string (uuid)",
+										required: true,
+										description: "The UUID of the account to update",
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="update-account-body"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("request_body")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "name",
+										type: "string",
+										required: false,
+										description: "Updated display name for the account",
+									},
+									{
+										name: "plaidAccountId",
+										type: "string",
+										required: false,
+										description: "Updated external Plaid account ID",
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="update-account-example"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("example_request")}
+							</h3>
+							<CodeBlock
+								tabs={[
+									{
+										label: "cURL",
+										code: `curl -X PATCH http://localhost:8080/api/v1/accounts/f7e6d5c4-b3a2-1908-fedc-ba0987654321 \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "name": "Primary Checking"
+  }'`,
+									},
+									{
+										label: "JavaScript",
+										code: `const response = await fetch(
+  "http://localhost:8080/api/v1/accounts/f7e6d5c4-b3a2-1908-fedc-ba0987654321",
+  {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: "Primary Checking" }),
+  }
+);
+
+const data = await response.json();
+console.log(data);`,
+									},
+									{
+										label: "Python",
+										code: `import requests
+
+response = requests.patch(
+    "http://localhost:8080/api/v1/accounts/f7e6d5c4-b3a2-1908-fedc-ba0987654321",
+    json={"name": "Primary Checking"},
+)
+
+print(response.json())`,
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="update-account-response"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("response")}
+							</h3>
+							<CodeBlock
+								response
+								tabs={[
+									{
+										label: "JSON",
+										code: `{
+  "success": true,
+  "message": "Account updated successfully",
+  "data": {
+    "id": "f7e6d5c4-b3a2-1908-fedc-ba0987654321",
+    "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Primary Checking",
+    "type": "BANK",
+    "currencyCode": "USD",
+    "currentBalance": 5000.00,
+    "plaidAccountId": null,
+    "status": "ACTIVE",
+    "createdAt": "2026-03-15T10:35:00Z",
+    "updatedAt": "2026-03-15T11:00:00Z"
+  },
+  "timestamp": "2026-03-15T11:00:00Z"
+}`,
+									},
+								]}
+							/>
+						</div>
+					</div>
+				</ApiEndpoint>
+			</div>
+
+			{/* DELETE /api/v1/accounts/{accountId} */}
+			<div className="space-y-4">
+				<h2 id="delete-account" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("delete_account")}
+				</h2>
+				<ApiEndpoint
+					method="DELETE"
+					path="/api/v1/accounts/{accountId}"
+					description="Deletes an account. The account must have a zero balance before deletion."
+				>
+					<div className="space-y-6">
+						<div>
+							<h3
+								id="delete-account-params"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("path_params")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "accountId",
+										type: "string (uuid)",
+										required: true,
+										description: "The UUID of the account to delete",
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="delete-account-example"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("example_request")}
+							</h3>
+							<CodeBlock
+								tabs={[
+									{
+										label: "cURL",
+										code: `curl -X DELETE http://localhost:8080/api/v1/accounts/f7e6d5c4-b3a2-1908-fedc-ba0987654321`,
+									},
+									{
+										label: "JavaScript",
+										code: `const response = await fetch(
+  "http://localhost:8080/api/v1/accounts/f7e6d5c4-b3a2-1908-fedc-ba0987654321",
+  { method: "DELETE" }
+);
+
+const data = await response.json();
+console.log(data);`,
+									},
+									{
+										label: "Python",
+										code: `import requests
+
+response = requests.delete(
+    "http://localhost:8080/api/v1/accounts/f7e6d5c4-b3a2-1908-fedc-ba0987654321"
+)
+
+print(response.json())`,
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="delete-account-response"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("response")}
+							</h3>
+							<CodeBlock
+								response
+								tabs={[
+									{
+										label: "JSON",
+										code: `{
+  "success": true,
+  "message": "Account deleted successfully",
+  "data": null,
+  "timestamp": "2026-03-15T11:05:00Z"
+}`,
+									},
+								]}
+							/>
+						</div>
+					</div>
+				</ApiEndpoint>
+			</div>
+
 			<PageNav
 				prev={{
 					label: "Users API",

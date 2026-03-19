@@ -2,6 +2,7 @@ package com.mrbt.orbit.ledger.core.service;
 
 import com.mrbt.orbit.common.exception.DuplicateResourceException;
 import com.mrbt.orbit.ledger.core.model.Category;
+import com.mrbt.orbit.ledger.core.model.enums.CategoryStatus;
 import com.mrbt.orbit.ledger.core.port.in.CreateCategoryUseCase;
 import com.mrbt.orbit.ledger.core.port.out.CategoryRepositoryPort;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,10 @@ public class CreateCategoryService implements CreateCategoryUseCase {
 		if (category.getUserId() != null
 				&& categoryRepositoryPort.existsByUserIdAndName(category.getUserId(), category.getName())) {
 			throw new DuplicateResourceException("Category", "Name", category.getName());
+		}
+
+		if (category.getStatus() == null) {
+			category.setStatus(CategoryStatus.ACTIVE);
 		}
 
 		if (category.getIsSystem() == null) {

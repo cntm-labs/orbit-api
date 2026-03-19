@@ -4,6 +4,7 @@ import com.mrbt.orbit.budget.core.model.Budget;
 import com.mrbt.orbit.budget.core.model.enums.BudgetStatus;
 import com.mrbt.orbit.budget.core.port.in.ArchiveBudgetUseCase;
 import com.mrbt.orbit.budget.core.port.in.GetBudgetUseCase;
+import com.mrbt.orbit.budget.core.port.in.UpdateBudgetUseCase;
 import com.mrbt.orbit.budget.core.port.out.BudgetRepositoryPort;
 import com.mrbt.orbit.common.core.model.PageResult;
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
@@ -16,7 +17,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class GetBudgetService implements GetBudgetUseCase, ArchiveBudgetUseCase {
+public class GetBudgetService implements GetBudgetUseCase, ArchiveBudgetUseCase, UpdateBudgetUseCase {
 
 	private final BudgetRepositoryPort budgetRepositoryPort;
 
@@ -39,5 +40,16 @@ public class GetBudgetService implements GetBudgetUseCase, ArchiveBudgetUseCase 
 				.orElseThrow(() -> new ResourceNotFoundException("Budget", "ID", budgetId));
 		budget.setStatus(BudgetStatus.ARCHIVED);
 		budgetRepositoryPort.save(budget);
+	}
+
+	@Override
+	@Transactional
+	public Budget updateBudget(UUID budgetId, String name) {
+		Budget budget = budgetRepositoryPort.findById(budgetId)
+				.orElseThrow(() -> new ResourceNotFoundException("Budget", "ID", budgetId));
+		if (name != null) {
+			budget.setName(name);
+		}
+		return budgetRepositoryPort.save(budget);
 	}
 }

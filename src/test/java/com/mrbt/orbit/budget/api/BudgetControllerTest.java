@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,12 +31,14 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mrbt.orbit.budget.api.mapper.BudgetDtoMapper;
 import com.mrbt.orbit.budget.api.request.CreateBudgetItemRequest;
 import com.mrbt.orbit.budget.api.request.CreateBudgetRequest;
+import com.mrbt.orbit.budget.api.request.UpdateBudgetRequest;
 import com.mrbt.orbit.budget.core.model.Budget;
 import com.mrbt.orbit.budget.core.model.enums.BudgetPeriodType;
 import com.mrbt.orbit.budget.core.model.enums.BudgetStatus;
 import com.mrbt.orbit.budget.core.port.in.ArchiveBudgetUseCase;
 import com.mrbt.orbit.budget.core.port.in.CreateBudgetUseCase;
 import com.mrbt.orbit.budget.core.port.in.GetBudgetUseCase;
+import com.mrbt.orbit.budget.core.port.in.UpdateBudgetUseCase;
 import com.mrbt.orbit.common.core.model.PageResult;
 
 @WebMvcTest(BudgetController.class)
@@ -56,6 +59,9 @@ class BudgetControllerTest {
 
 	@MockitoBean
 	private ArchiveBudgetUseCase archiveBudgetUseCase;
+
+	@MockitoBean
+	private UpdateBudgetUseCase updateBudgetUseCase;
 
 	@Test
 	void createBudget_returns201() throws Exception {
@@ -123,6 +129,32 @@ class BudgetControllerTest {
 		UUID budgetId = UUID.randomUUID();
 
 		mockMvc.perform(patch("/api/v1/budgets/{budgetId}/archive", budgetId)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.success").value(true));
+	}
+
+	@Test
+	void updateBudget_returns200() throws Exception {
+		UUID budgetId = UUID.randomUUID();
+		Budget updated = Budget.builder().id(budgetId).userId(UUID.randomUUID()).name("Updated Budget")
+				.periodType(BudgetPeriodType.MONTHLY).startDate(LocalDate.of(2026, 3, 1))
+				.endDate(LocalDate.of(2026, 3, 31)).totalAmount(new BigDecimal("500")).status(BudgetStatus.ACTIVE)
+				.items(List.of()).build();
+
+		when(updateBudgetUseCase.updateBudget(eq(budgetId), eq("Updated Budget"))).thenReturn(updated);
+
+		UpdateBudgetRequest request = UpdateBudgetRequest.builder().name("Updated Budget").build();
+
+		mockMvc.perform(patch("/api/v1/budgets/{budgetId}", budgetId).contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request))).andExpect(status().isOk())
+				.andExpect(jsonPath("$.success").value(true))
+				.andExpect(jsonPath("$.data.name").value("Updated Budget"));
+	}
+
+	@Test
+	void deleteBudget_returns200() throws Exception {
+		UUID budgetId = UUID.randomUUID();
+
+		mockMvc.perform(delete("/api/v1/budgets/{budgetId}", budgetId)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.success").value(true));
 	}
 

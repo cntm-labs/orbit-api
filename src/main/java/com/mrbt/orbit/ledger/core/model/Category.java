@@ -1,6 +1,7 @@
 package com.mrbt.orbit.ledger.core.model;
 
 import com.mrbt.orbit.common.core.model.BaseDomainModel;
+import com.mrbt.orbit.ledger.core.model.enums.CategoryStatus;
 import com.mrbt.orbit.ledger.core.model.enums.CategoryType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,5 +23,6 @@ public class Category extends BaseDomainModel {
 	private String icon;
 	private String color;
 	private Boolean isSystem;
+	private CategoryStatus status;
 	private UUID parentCategoryId;
 }

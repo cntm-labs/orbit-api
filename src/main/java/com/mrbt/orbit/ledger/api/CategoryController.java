@@ -2,10 +2,13 @@ package com.mrbt.orbit.ledger.api;
 
 import com.mrbt.orbit.common.api.ApiResponse;
 import com.mrbt.orbit.ledger.api.request.CreateCategoryRequest;
+import com.mrbt.orbit.ledger.api.request.UpdateCategoryRequest;
 import com.mrbt.orbit.ledger.api.response.CategoryResponse;
 import com.mrbt.orbit.ledger.core.model.Category;
 import com.mrbt.orbit.ledger.core.port.in.CreateCategoryUseCase;
+import com.mrbt.orbit.ledger.core.port.in.DeleteCategoryUseCase;
 import com.mrbt.orbit.ledger.core.port.in.GetCategoryUseCase;
+import com.mrbt.orbit.ledger.core.port.in.UpdateCategoryUseCase;
 import com.mrbt.orbit.ledger.infrastructure.mapper.CategoryMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,6 +30,8 @@ public class CategoryController {
 
 	private final CreateCategoryUseCase createCategoryUseCase;
 	private final GetCategoryUseCase getCategoryUseCase;
+	private final UpdateCategoryUseCase updateCategoryUseCase;
+	private final DeleteCategoryUseCase deleteCategoryUseCase;
 	private final CategoryMapper categoryMapper;
 
 	@PostMapping
@@ -61,5 +66,20 @@ public class CategoryController {
 				.collect(Collectors.toList());
 
 		return ResponseEntity.ok(ApiResponse.success(responses));
+	}
+
+	@PatchMapping("/{categoryId}")
+	@Operation(summary = "Update a category", description = "Partially updates category fields")
+	public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(@PathVariable UUID categoryId,
+			@Valid @RequestBody UpdateCategoryRequest request) {
+		Category updated = updateCategoryUseCase.updateCategory(categoryId, request.name(), request.parentCategoryId());
+		return ResponseEntity.ok(ApiResponse.success("Category updated", categoryMapper.toResponse(updated)));
+	}
+
+	@DeleteMapping("/{categoryId}")
+	@Operation(summary = "Delete a category", description = "Soft deletes a category by setting status to INACTIVE")
+	public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable UUID categoryId) {
+		deleteCategoryUseCase.deleteCategory(categoryId);
+		return ResponseEntity.ok(ApiResponse.success("Category deleted", null));
 	}
 }

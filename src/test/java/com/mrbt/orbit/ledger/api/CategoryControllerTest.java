@@ -1,8 +1,12 @@
 package com.mrbt.orbit.ledger.api;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,10 +25,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mrbt.orbit.ledger.api.request.CreateCategoryRequest;
+import com.mrbt.orbit.ledger.api.request.UpdateCategoryRequest;
 import com.mrbt.orbit.ledger.core.model.Category;
+import com.mrbt.orbit.ledger.core.model.enums.CategoryStatus;
 import com.mrbt.orbit.ledger.core.model.enums.CategoryType;
 import com.mrbt.orbit.ledger.core.port.in.CreateCategoryUseCase;
+import com.mrbt.orbit.ledger.core.port.in.DeleteCategoryUseCase;
 import com.mrbt.orbit.ledger.core.port.in.GetCategoryUseCase;
+import com.mrbt.orbit.ledger.core.port.in.UpdateCategoryUseCase;
 import com.mrbt.orbit.ledger.infrastructure.mapper.CategoryMapper;
 
 @WebMvcTest(CategoryController.class)
@@ -42,6 +50,12 @@ class CategoryControllerTest {
 
 	@MockitoBean
 	private GetCategoryUseCase getCategoryUseCase;
+
+	@MockitoBean
+	private UpdateCategoryUseCase updateCategoryUseCase;
+
+	@MockitoBean
+	private DeleteCategoryUseCase deleteCategoryUseCase;
 
 	@Test
 	void createCategory_returns201() throws Exception {
@@ -82,6 +96,29 @@ class CategoryControllerTest {
 
 		mockMvc.perform(get("/api/v1/categories/user/{userId}", userId)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.data[0].name").value("Custom"));
+	}
+
+	@Test
+	void updateCategory_returns200() throws Exception {
+		UUID categoryId = UUID.randomUUID();
+		Category updated = Category.builder().id(categoryId).name("New Name").type(CategoryType.EXPENSE)
+				.status(CategoryStatus.ACTIVE).build();
+
+		when(updateCategoryUseCase.updateCategory(eq(categoryId), eq("New Name"), isNull())).thenReturn(updated);
+
+		UpdateCategoryRequest request = UpdateCategoryRequest.builder().name("New Name").build();
+
+		mockMvc.perform(patch("/api/v1/categories/{categoryId}", categoryId).contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request))).andExpect(status().isOk())
+				.andExpect(jsonPath("$.success").value(true)).andExpect(jsonPath("$.data.name").value("New Name"));
+	}
+
+	@Test
+	void deleteCategory_returns200() throws Exception {
+		UUID categoryId = UUID.randomUUID();
+
+		mockMvc.perform(delete("/api/v1/categories/{categoryId}", categoryId)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.success").value(true));
 	}
 
 }

@@ -560,6 +560,247 @@ print(response.json())`,
 				</ApiEndpoint>
 			</div>
 
+			{/* PATCH /api/v1/budgets/{budgetId} */}
+			<div className="space-y-4">
+				<h2 id="update-budget" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("update_budget")}
+				</h2>
+				<ApiEndpoint
+					method="PATCH"
+					path="/api/v1/budgets/{budgetId}"
+					description="Updates an existing budget's name, period dates, or line items"
+				>
+					<div className="space-y-6">
+						<div>
+							<h3
+								id="update-budget-params"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("path_params")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "budgetId",
+										type: "string (uuid)",
+										required: true,
+										description: "The UUID of the budget to update",
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="update-budget-body"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("request_body")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "name",
+										type: "string",
+										required: false,
+										description: "Updated budget name",
+									},
+									{
+										name: "endDate",
+										type: "string (date)",
+										required: false,
+										description: "Updated end date (ISO 8601)",
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="update-budget-example"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("example_request")}
+							</h3>
+							<CodeBlock
+								tabs={[
+									{
+										label: "cURL",
+										code: `curl -X PATCH http://localhost:8080/api/v1/budgets/b1a2b3c4-d5e6-7890-abcd-ef1234567890 \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "name": "March 2026 Budget (Revised)"
+  }'`,
+									},
+									{
+										label: "JavaScript",
+										code: `const budgetId = "b1a2b3c4-d5e6-7890-abcd-ef1234567890";
+const response = await fetch(
+  \`http://localhost:8080/api/v1/budgets/\${budgetId}\`,
+  {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: "March 2026 Budget (Revised)" }),
+  }
+);
+
+const data = await response.json();
+console.log(data);`,
+									},
+									{
+										label: "Python",
+										code: `import requests
+
+response = requests.patch(
+    "http://localhost:8080/api/v1/budgets/b1a2b3c4-d5e6-7890-abcd-ef1234567890",
+    json={"name": "March 2026 Budget (Revised)"},
+)
+
+print(response.json())`,
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="update-budget-response"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("response")}
+							</h3>
+							<CodeBlock
+								response
+								tabs={[
+									{
+										label: "JSON",
+										code: `{
+  "success": true,
+  "message": "Budget updated successfully",
+  "data": {
+    "id": "b1a2b3c4-d5e6-7890-abcd-ef1234567890",
+    "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "March 2026 Budget (Revised)",
+    "periodType": "MONTHLY",
+    "startDate": "2026-03-01",
+    "endDate": "2026-03-31",
+    "totalAmount": 2000.00,
+    "status": "ACTIVE",
+    "items": [
+      {
+        "id": "bi-0001-aaaa-bbbb-cccc-dddddddddddd",
+        "categoryId": "cat-food-0001",
+        "allocatedAmount": 500.00,
+        "spentAmount": 125.50,
+        "alertThresholdPct": 80
+      }
+    ],
+    "createdAt": "2026-03-18T10:00:00Z"
+  },
+  "timestamp": "2026-03-18T11:00:00Z"
+}`,
+									},
+								]}
+							/>
+						</div>
+					</div>
+				</ApiEndpoint>
+			</div>
+
+			{/* DELETE /api/v1/budgets/{budgetId} */}
+			<div className="space-y-4">
+				<h2 id="delete-budget" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("delete_budget")}
+				</h2>
+				<ApiEndpoint
+					method="DELETE"
+					path="/api/v1/budgets/{budgetId}"
+					description="Permanently deletes a budget and all its line items"
+				>
+					<div className="space-y-6">
+						<div>
+							<h3
+								id="delete-budget-params"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("path_params")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "budgetId",
+										type: "string (uuid)",
+										required: true,
+										description: "The UUID of the budget to delete",
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="delete-budget-example"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("example_request")}
+							</h3>
+							<CodeBlock
+								tabs={[
+									{
+										label: "cURL",
+										code: `curl -X DELETE http://localhost:8080/api/v1/budgets/b1a2b3c4-d5e6-7890-abcd-ef1234567890`,
+									},
+									{
+										label: "JavaScript",
+										code: `const budgetId = "b1a2b3c4-d5e6-7890-abcd-ef1234567890";
+const response = await fetch(
+  \`http://localhost:8080/api/v1/budgets/\${budgetId}\`,
+  { method: "DELETE" }
+);
+
+const data = await response.json();
+console.log(data);`,
+									},
+									{
+										label: "Python",
+										code: `import requests
+
+response = requests.delete(
+    "http://localhost:8080/api/v1/budgets/b1a2b3c4-d5e6-7890-abcd-ef1234567890"
+)
+
+print(response.json())`,
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="delete-budget-response"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("response")}
+							</h3>
+							<CodeBlock
+								response
+								tabs={[
+									{
+										label: "JSON",
+										code: `{
+  "success": true,
+  "message": "Budget deleted successfully",
+  "data": null,
+  "timestamp": "2026-03-18T11:05:00Z"
+}`,
+									},
+								]}
+							/>
+						</div>
+					</div>
+				</ApiEndpoint>
+			</div>
+
 			<PageNav
 				prev={{
 					label: "Notifications API",

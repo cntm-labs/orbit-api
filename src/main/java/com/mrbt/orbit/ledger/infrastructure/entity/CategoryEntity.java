@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.mrbt.orbit.common.infrastructure.entity.BaseEntity;
+import com.mrbt.orbit.ledger.core.model.enums.CategoryStatus;
 import com.mrbt.orbit.ledger.core.model.enums.CategoryType;
 
 import jakarta.persistence.Column;
@@ -38,6 +39,10 @@ public class CategoryEntity extends BaseEntity {
 	private String icon;
 
 	private String color;
+
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private CategoryStatus status;
 
 	@Column(nullable = false)
 	private Boolean isSystem;

@@ -136,7 +136,19 @@
 		"create_goal": "Create a Goal",
 		"get_goal_by_id": "Get Goal by ID",
 		"get_goals_by_user": "Get Goals by User",
-		"contribute_to_goal": "Contribute to a Goal"
+		"contribute_to_goal": "Contribute to a Goal",
+		"update_user": "Update User Profile",
+		"delete_user": "Deactivate User",
+		"update_account": "Update Account",
+		"delete_account": "Delete Account",
+		"update_transaction": "Update Transaction",
+		"void_transaction": "Void Transaction",
+		"update_category": "Update Category",
+		"delete_category": "Delete Category",
+		"update_budget": "Update Budget",
+		"delete_budget": "Delete Budget",
+		"update_goal": "Update Goal",
+		"cancel_goal": "Cancel Goal"
 	},
 	"common": {
 		"previous": "Previous",

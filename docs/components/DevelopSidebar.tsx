@@ -79,6 +79,8 @@ export default function DevelopSidebar({ locale, mobile }: { locale: string; mob
 			items: [
 				{ method: "POST", label: "Register User", href: `/${locale}/develop/api/users` },
 				{ method: "GET", label: "Get by Clerk ID", href: `/${locale}/develop/api/users` },
+				{ method: "PATCH", label: "Update User", href: `/${locale}/develop/api/users` },
+				{ method: "DELETE", label: "Delete User", href: `/${locale}/develop/api/users` },
 			],
 		},
 		{
@@ -89,6 +91,8 @@ export default function DevelopSidebar({ locale, mobile }: { locale: string; mob
 				{ method: "POST", label: "Create Account", href: `/${locale}/develop/api/accounts` },
 				{ method: "GET", label: "Get Account", href: `/${locale}/develop/api/accounts` },
 				{ method: "GET", label: "Get User Accounts", href: `/${locale}/develop/api/accounts` },
+				{ method: "PATCH", label: "Update Account", href: `/${locale}/develop/api/accounts` },
+				{ method: "DELETE", label: "Delete Account", href: `/${locale}/develop/api/accounts` },
 			],
 		},
 		{
@@ -103,6 +107,16 @@ export default function DevelopSidebar({ locale, mobile }: { locale: string; mob
 				},
 				{ method: "GET", label: "Get by ID", href: `/${locale}/develop/api/transactions` },
 				{ method: "GET", label: "Get by Account", href: `/${locale}/develop/api/transactions` },
+				{
+					method: "PATCH",
+					label: "Update Transaction",
+					href: `/${locale}/develop/api/transactions`,
+				},
+				{
+					method: "DELETE",
+					label: "Void Transaction",
+					href: `/${locale}/develop/api/transactions`,
+				},
 			],
 		},
 		{
@@ -113,6 +127,8 @@ export default function DevelopSidebar({ locale, mobile }: { locale: string; mob
 				{ method: "POST", label: "Create Category", href: `/${locale}/develop/api/categories` },
 				{ method: "GET", label: "System Categories", href: `/${locale}/develop/api/categories` },
 				{ method: "GET", label: "User Categories", href: `/${locale}/develop/api/categories` },
+				{ method: "PATCH", label: "Update Category", href: `/${locale}/develop/api/categories` },
+				{ method: "DELETE", label: "Delete Category", href: `/${locale}/develop/api/categories` },
 			],
 		},
 		{
@@ -135,6 +151,8 @@ export default function DevelopSidebar({ locale, mobile }: { locale: string; mob
 				{ method: "GET", label: "Get Budget", href: `/${locale}/develop/api/budgets` },
 				{ method: "GET", label: "User Budgets", href: `/${locale}/develop/api/budgets` },
 				{ method: "PATCH", label: "Archive", href: `/${locale}/develop/api/budgets` },
+				{ method: "PATCH", label: "Update Budget", href: `/${locale}/develop/api/budgets` },
+				{ method: "DELETE", label: "Delete Budget", href: `/${locale}/develop/api/budgets` },
 			],
 		},
 		{
@@ -146,6 +164,8 @@ export default function DevelopSidebar({ locale, mobile }: { locale: string; mob
 				{ method: "GET", label: "Get Goal", href: `/${locale}/develop/api/goals` },
 				{ method: "GET", label: "User Goals", href: `/${locale}/develop/api/goals` },
 				{ method: "PATCH", label: "Contribute", href: `/${locale}/develop/api/goals` },
+				{ method: "PATCH", label: "Update Goal", href: `/${locale}/develop/api/goals` },
+				{ method: "DELETE", label: "Cancel Goal", href: `/${locale}/develop/api/goals` },
 			],
 		},
 	];

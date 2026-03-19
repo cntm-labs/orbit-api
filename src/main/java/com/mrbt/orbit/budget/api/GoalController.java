@@ -3,11 +3,14 @@ package com.mrbt.orbit.budget.api;
 import com.mrbt.orbit.budget.api.mapper.GoalDtoMapper;
 import com.mrbt.orbit.budget.api.request.ContributeGoalRequest;
 import com.mrbt.orbit.budget.api.request.CreateGoalRequest;
+import com.mrbt.orbit.budget.api.request.UpdateGoalRequest;
 import com.mrbt.orbit.budget.api.response.GoalResponse;
 import com.mrbt.orbit.budget.core.model.Goal;
 import com.mrbt.orbit.budget.core.port.in.ContributeGoalUseCase;
 import com.mrbt.orbit.budget.core.port.in.CreateGoalUseCase;
+import com.mrbt.orbit.budget.core.port.in.DeleteGoalUseCase;
 import com.mrbt.orbit.budget.core.port.in.GetGoalUseCase;
+import com.mrbt.orbit.budget.core.port.in.UpdateGoalUseCase;
 import com.mrbt.orbit.common.api.ApiResponse;
 import com.mrbt.orbit.common.api.PaginationParams;
 import com.mrbt.orbit.common.core.model.PageResult;
@@ -31,6 +34,8 @@ public class GoalController {
 	private final CreateGoalUseCase createGoalUseCase;
 	private final GetGoalUseCase getGoalUseCase;
 	private final ContributeGoalUseCase contributeGoalUseCase;
+	private final UpdateGoalUseCase updateGoalUseCase;
+	private final DeleteGoalUseCase deleteGoalUseCase;
 	private final GoalDtoMapper dtoMapper;
 
 	@PostMapping
@@ -67,5 +72,21 @@ public class GoalController {
 			@Valid @RequestBody ContributeGoalRequest request) {
 		Goal goal = contributeGoalUseCase.contribute(goalId, request.amount());
 		return ResponseEntity.ok(ApiResponse.success("Contribution recorded", dtoMapper.toResponse(goal)));
+	}
+
+	@PatchMapping("/{goalId}")
+	@Operation(summary = "Update a goal", description = "Partially updates goal fields")
+	public ResponseEntity<ApiResponse<GoalResponse>> updateGoal(@PathVariable UUID goalId,
+			@Valid @RequestBody UpdateGoalRequest request) {
+		Goal updated = updateGoalUseCase.updateGoal(goalId, request.name(), request.targetAmount(),
+				request.targetDate());
+		return ResponseEntity.ok(ApiResponse.success("Goal updated", dtoMapper.toResponse(updated)));
+	}
+
+	@DeleteMapping("/{goalId}")
+	@Operation(summary = "Cancel a goal", description = "Soft deletes a goal by setting status to CANCELLED")
+	public ResponseEntity<ApiResponse<Void>> deleteGoal(@PathVariable UUID goalId) {
+		deleteGoalUseCase.cancelGoal(goalId);
+		return ResponseEntity.ok(ApiResponse.success("Goal cancelled", null));
 	}
 }

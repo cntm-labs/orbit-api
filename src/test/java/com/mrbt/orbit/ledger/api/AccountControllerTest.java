@@ -1,8 +1,11 @@
 package com.mrbt.orbit.ledger.api;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -23,11 +26,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mrbt.orbit.ledger.api.request.CreateAccountRequest;
+import com.mrbt.orbit.ledger.api.request.UpdateAccountRequest;
 import com.mrbt.orbit.ledger.core.model.Account;
 import com.mrbt.orbit.ledger.core.model.enums.AccountStatus;
 import com.mrbt.orbit.ledger.core.model.enums.AccountType;
 import com.mrbt.orbit.ledger.core.port.in.CreateAccountUseCase;
+import com.mrbt.orbit.ledger.core.port.in.DeleteAccountUseCase;
 import com.mrbt.orbit.ledger.core.port.in.GetAccountUseCase;
+import com.mrbt.orbit.ledger.core.port.in.UpdateAccountUseCase;
 import com.mrbt.orbit.ledger.infrastructure.mapper.AccountMapper;
 
 @WebMvcTest(AccountController.class)
@@ -45,6 +51,12 @@ class AccountControllerTest {
 
 	@MockitoBean
 	private GetAccountUseCase getAccountUseCase;
+
+	@MockitoBean
+	private UpdateAccountUseCase updateAccountUseCase;
+
+	@MockitoBean
+	private DeleteAccountUseCase deleteAccountUseCase;
 
 	@Test
 	void createAccount_returns201() throws Exception {
@@ -96,6 +108,29 @@ class AccountControllerTest {
 
 		mockMvc.perform(get("/api/v1/accounts/user/{userId}", userId)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.data").isArray()).andExpect(jsonPath("$.data[0].name").value("A1"));
+	}
+
+	@Test
+	void updateAccount_returns200() throws Exception {
+		UUID accountId = UUID.randomUUID();
+		Account updated = Account.builder().id(accountId).name("New Name").type(AccountType.BANK)
+				.status(AccountStatus.ACTIVE).currentBalance(BigDecimal.ZERO).build();
+
+		when(updateAccountUseCase.updateAccount(eq(accountId), eq("New Name"))).thenReturn(updated);
+
+		UpdateAccountRequest request = UpdateAccountRequest.builder().name("New Name").build();
+
+		mockMvc.perform(patch("/api/v1/accounts/{accountId}", accountId).contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request))).andExpect(status().isOk())
+				.andExpect(jsonPath("$.success").value(true)).andExpect(jsonPath("$.data.name").value("New Name"));
+	}
+
+	@Test
+	void deleteAccount_returns200() throws Exception {
+		UUID accountId = UUID.randomUUID();
+
+		mockMvc.perform(delete("/api/v1/accounts/{accountId}", accountId)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.success").value(true));
 	}
 
 }

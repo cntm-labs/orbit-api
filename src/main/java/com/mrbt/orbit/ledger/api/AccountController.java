@@ -3,10 +3,13 @@ package com.mrbt.orbit.ledger.api;
 import com.mrbt.orbit.common.api.ApiResponse;
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.ledger.api.request.CreateAccountRequest;
+import com.mrbt.orbit.ledger.api.request.UpdateAccountRequest;
 import com.mrbt.orbit.ledger.api.response.AccountResponse;
 import com.mrbt.orbit.ledger.core.model.Account;
 import com.mrbt.orbit.ledger.core.port.in.CreateAccountUseCase;
+import com.mrbt.orbit.ledger.core.port.in.DeleteAccountUseCase;
 import com.mrbt.orbit.ledger.core.port.in.GetAccountUseCase;
+import com.mrbt.orbit.ledger.core.port.in.UpdateAccountUseCase;
 import com.mrbt.orbit.ledger.infrastructure.mapper.AccountMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,6 +30,8 @@ public class AccountController {
 
 	private final CreateAccountUseCase createAccountUseCase;
 	private final GetAccountUseCase getAccountUseCase;
+	private final UpdateAccountUseCase updateAccountUseCase;
+	private final DeleteAccountUseCase deleteAccountUseCase;
 	private final AccountMapper accountMapper;
 
 	@PostMapping
@@ -57,5 +62,20 @@ public class AccountController {
 		List<AccountResponse> responses = accountMapper.toResponseList(accounts);
 
 		return ResponseEntity.ok(ApiResponse.success(responses));
+	}
+
+	@PatchMapping("/{accountId}")
+	@Operation(summary = "Update an account", description = "Partially updates account fields")
+	public ResponseEntity<ApiResponse<AccountResponse>> updateAccount(@PathVariable UUID accountId,
+			@Valid @RequestBody UpdateAccountRequest request) {
+		Account updated = updateAccountUseCase.updateAccount(accountId, request.name());
+		return ResponseEntity.ok(ApiResponse.success("Account updated", accountMapper.toResponse(updated)));
+	}
+
+	@DeleteMapping("/{accountId}")
+	@Operation(summary = "Delete an account", description = "Soft deletes an account by setting status to CLOSED")
+	public ResponseEntity<ApiResponse<Void>> deleteAccount(@PathVariable UUID accountId) {
+		deleteAccountUseCase.deleteAccount(accountId);
+		return ResponseEntity.ok(ApiResponse.success("Account deleted", null));
 	}
 }

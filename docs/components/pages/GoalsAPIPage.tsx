@@ -544,6 +544,251 @@ print(response.json())`,
 				</ApiEndpoint>
 			</div>
 
+			{/* PATCH /api/v1/goals/{goalId} */}
+			<div className="space-y-4">
+				<h2 id="update-goal" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("update_goal")}
+				</h2>
+				<ApiEndpoint
+					method="PATCH"
+					path="/api/v1/goals/{goalId}"
+					description="Updates an existing goal's name, target amount, target date, or linked account"
+				>
+					<div className="space-y-6">
+						<div>
+							<h3
+								id="update-goal-params"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("path_params")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "goalId",
+										type: "string (uuid)",
+										required: true,
+										description: "The UUID of the goal to update",
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="update-goal-body"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("request_body")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "name",
+										type: "string",
+										required: false,
+										description: "Updated goal name",
+									},
+									{
+										name: "targetAmount",
+										type: "number",
+										required: false,
+										description: "Updated target amount",
+									},
+									{
+										name: "targetDate",
+										type: "string (date)",
+										required: false,
+										description: "Updated target date (ISO 8601)",
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="update-goal-example"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("example_request")}
+							</h3>
+							<CodeBlock
+								tabs={[
+									{
+										label: "cURL",
+										code: `curl -X PATCH http://localhost:8080/api/v1/goals/g1a2b3c4-d5e6-7890-abcd-ef1234567890 \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "name": "Emergency Fund (Extended)",
+    "targetAmount": 15000.00
+  }'`,
+									},
+									{
+										label: "JavaScript",
+										code: `const goalId = "g1a2b3c4-d5e6-7890-abcd-ef1234567890";
+const response = await fetch(
+  \`http://localhost:8080/api/v1/goals/\${goalId}\`,
+  {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: "Emergency Fund (Extended)",
+      targetAmount: 15000.00,
+    }),
+  }
+);
+
+const data = await response.json();
+console.log(data);`,
+									},
+									{
+										label: "Python",
+										code: `import requests
+
+response = requests.patch(
+    "http://localhost:8080/api/v1/goals/g1a2b3c4-d5e6-7890-abcd-ef1234567890",
+    json={
+        "name": "Emergency Fund (Extended)",
+        "targetAmount": 15000.00,
+    },
+)
+
+print(response.json())`,
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="update-goal-response"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("response")}
+							</h3>
+							<CodeBlock
+								response
+								tabs={[
+									{
+										label: "JSON",
+										code: `{
+  "success": true,
+  "message": "Goal updated successfully",
+  "data": {
+    "id": "g1a2b3c4-d5e6-7890-abcd-ef1234567890",
+    "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Emergency Fund (Extended)",
+    "targetAmount": 15000.00,
+    "currentAmount": 3750.00,
+    "targetDate": "2026-12-31",
+    "linkedAccountId": "acc-sav-0001-aaaa-bbbbbbbbbbbb",
+    "status": "IN_PROGRESS",
+    "createdAt": "2026-03-18T10:00:00Z"
+  },
+  "timestamp": "2026-03-18T11:00:00Z"
+}`,
+									},
+								]}
+							/>
+						</div>
+					</div>
+				</ApiEndpoint>
+			</div>
+
+			{/* DELETE /api/v1/goals/{goalId} */}
+			<div className="space-y-4">
+				<h2 id="cancel-goal" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("cancel_goal")}
+				</h2>
+				<ApiEndpoint
+					method="DELETE"
+					path="/api/v1/goals/{goalId}"
+					description="Cancels a goal. The goal status is set to CANCELLED and no further contributions are accepted."
+				>
+					<div className="space-y-6">
+						<div>
+							<h3
+								id="cancel-goal-params"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("path_params")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "goalId",
+										type: "string (uuid)",
+										required: true,
+										description: "The UUID of the goal to cancel",
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="cancel-goal-example"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("example_request")}
+							</h3>
+							<CodeBlock
+								tabs={[
+									{
+										label: "cURL",
+										code: `curl -X DELETE http://localhost:8080/api/v1/goals/g1a2b3c4-d5e6-7890-abcd-ef1234567890`,
+									},
+									{
+										label: "JavaScript",
+										code: `const goalId = "g1a2b3c4-d5e6-7890-abcd-ef1234567890";
+const response = await fetch(
+  \`http://localhost:8080/api/v1/goals/\${goalId}\`,
+  { method: "DELETE" }
+);
+
+const data = await response.json();
+console.log(data);`,
+									},
+									{
+										label: "Python",
+										code: `import requests
+
+response = requests.delete(
+    "http://localhost:8080/api/v1/goals/g1a2b3c4-d5e6-7890-abcd-ef1234567890"
+)
+
+print(response.json())`,
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="cancel-goal-response"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("response")}
+							</h3>
+							<CodeBlock
+								response
+								tabs={[
+									{
+										label: "JSON",
+										code: `{
+  "success": true,
+  "message": "Goal cancelled successfully",
+  "data": null,
+  "timestamp": "2026-03-18T11:05:00Z"
+}`,
+									},
+								]}
+							/>
+						</div>
+					</div>
+				</ApiEndpoint>
+			</div>
+
 			<PageNav
 				prev={{
 					label: "Budgets API",

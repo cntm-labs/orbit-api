@@ -292,6 +292,254 @@ print(response.json())`,
 				</ApiEndpoint>
 			</div>
 
+			{/* PATCH /api/v1/users/{userId} */}
+			<div className="space-y-4">
+				<h2 id="update-user" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("update_user")}
+				</h2>
+				<ApiEndpoint
+					method="PATCH"
+					path="/api/v1/users/{userId}"
+					description="Updates an existing user's profile fields"
+				>
+					<div className="space-y-6">
+						<div>
+							<h3
+								id="update-user-params"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("path_params")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "userId",
+										type: "string (uuid)",
+										required: true,
+										description: "The UUID of the user to update",
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="update-user-body"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("request_body")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "firstName",
+										type: "string",
+										required: false,
+										description: "Updated first name",
+									},
+									{
+										name: "lastName",
+										type: "string",
+										required: false,
+										description: "Updated last name",
+									},
+									{
+										name: "baseCurrency",
+										type: "string",
+										required: false,
+										description: "Updated preferred base currency code",
+									},
+									{
+										name: "timezone",
+										type: "string",
+										required: false,
+										description: "Updated timezone",
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="update-user-example"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("example_request")}
+							</h3>
+							<CodeBlock
+								tabs={[
+									{
+										label: "cURL",
+										code: `curl -X PATCH http://localhost:8080/api/v1/users/a1b2c3d4-e5f6-7890-abcd-ef1234567890 \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "firstName": "Jonathan",
+    "baseCurrency": "THB"
+  }'`,
+									},
+									{
+										label: "JavaScript",
+										code: `const response = await fetch(
+  "http://localhost:8080/api/v1/users/a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      firstName: "Jonathan",
+      baseCurrency: "THB",
+    }),
+  }
+);
+
+const data = await response.json();
+console.log(data);`,
+									},
+									{
+										label: "Python",
+										code: `import requests
+
+response = requests.patch(
+    "http://localhost:8080/api/v1/users/a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    json={
+        "firstName": "Jonathan",
+        "baseCurrency": "THB",
+    },
+)
+
+print(response.json())`,
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="update-user-response"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("response")}
+							</h3>
+							<CodeBlock
+								response
+								tabs={[
+									{
+										label: "JSON",
+										code: `{
+  "success": true,
+  "message": "User updated successfully",
+  "data": {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "email": "john@example.com",
+    "firstName": "Jonathan",
+    "lastName": "Doe",
+    "baseCurrency": "THB",
+    "timezone": "America/New_York",
+    "status": "ACTIVE",
+    "createdAt": "2026-03-15T10:30:00Z"
+  },
+  "timestamp": "2026-03-15T11:00:00Z"
+}`,
+									},
+								]}
+							/>
+						</div>
+					</div>
+				</ApiEndpoint>
+			</div>
+
+			{/* DELETE /api/v1/users/{userId} */}
+			<div className="space-y-4">
+				<h2 id="delete-user" className="text-xl font-semibold text-[#F0EDF5]">
+					{t("delete_user")}
+				</h2>
+				<ApiEndpoint
+					method="DELETE"
+					path="/api/v1/users/{userId}"
+					description="Deactivates a user account. The user record is soft-deleted (status set to INACTIVE)."
+				>
+					<div className="space-y-6">
+						<div>
+							<h3
+								id="delete-user-params"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("path_params")}
+							</h3>
+							<ParamTable
+								params={[
+									{
+										name: "userId",
+										type: "string (uuid)",
+										required: true,
+										description: "The UUID of the user to deactivate",
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="delete-user-example"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("example_request")}
+							</h3>
+							<CodeBlock
+								tabs={[
+									{
+										label: "cURL",
+										code: `curl -X DELETE http://localhost:8080/api/v1/users/a1b2c3d4-e5f6-7890-abcd-ef1234567890`,
+									},
+									{
+										label: "JavaScript",
+										code: `const response = await fetch(
+  "http://localhost:8080/api/v1/users/a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  { method: "DELETE" }
+);
+
+const data = await response.json();
+console.log(data);`,
+									},
+									{
+										label: "Python",
+										code: `import requests
+
+response = requests.delete(
+    "http://localhost:8080/api/v1/users/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+)
+
+print(response.json())`,
+									},
+								]}
+							/>
+						</div>
+
+						<div>
+							<h3
+								id="delete-user-response"
+								className="text-sm font-semibold text-[#9B8FB8] uppercase tracking-wider mb-3"
+							>
+								{ta("response")}
+							</h3>
+							<CodeBlock
+								response
+								tabs={[
+									{
+										label: "JSON",
+										code: `{
+  "success": true,
+  "message": "User deactivated successfully",
+  "data": null,
+  "timestamp": "2026-03-15T11:05:00Z"
+}`,
+									},
+								]}
+							/>
+						</div>
+					</div>
+				</ApiEndpoint>
+			</div>
+
 			<PageNav
 				prev={{
 					label: "Quick Start",

@@ -14,7 +14,8 @@ public class CategoryMapper {
 			return null;
 
 		return Category.builder().id(entity.getId()).userId(entity.getUserId()).name(entity.getName())
-				.type(entity.getType()).icon(entity.getIcon()).color(entity.getColor()).isSystem(entity.getIsSystem())
+				.type(entity.getType()).icon(entity.getIcon()).color(entity.getColor()).status(entity.getStatus())
+				.isSystem(entity.getIsSystem())
 				.parentCategoryId(entity.getParentCategory() != null ? entity.getParentCategory().getId() : null)
 				.createdAt(entity.getCreatedAt() != null ? entity.getCreatedAt().atOffset(ZoneOffset.UTC) : null)
 				.updatedAt(entity.getUpdatedAt() != null ? entity.getUpdatedAt().atOffset(ZoneOffset.UTC) : null)
@@ -32,6 +33,7 @@ public class CategoryMapper {
 		entity.setType(domain.getType());
 		entity.setIcon(domain.getIcon());
 		entity.setColor(domain.getColor());
+		entity.setStatus(domain.getStatus());
 		entity.setIsSystem(domain.getIsSystem());
 
 		// Note: The parentCategory relation must be resolved by the RepositoryAdapter
@@ -48,7 +50,8 @@ public class CategoryMapper {
 		return com.mrbt.orbit.ledger.api.response.CategoryResponse.builder().id(domain.getId())
 				.userId(domain.getUserId()).name(domain.getName())
 				.type(domain.getType() != null ? domain.getType().name() : null).icon(domain.getIcon())
-				.color(domain.getColor()).isSystem(domain.getIsSystem()).parentCategoryId(domain.getParentCategoryId())
+				.color(domain.getColor()).status(domain.getStatus() != null ? domain.getStatus().name() : null)
+				.isSystem(domain.getIsSystem()).parentCategoryId(domain.getParentCategoryId())
 				.createdAt(domain.getCreatedAt()).updatedAt(domain.getUpdatedAt()).build();
 	}
 }

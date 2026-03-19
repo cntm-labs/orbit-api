@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -21,6 +22,11 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 		UserEntity entity = mapper.toEntity(user);
 		UserEntity savedEntity = springDataRepository.save(entity);
 		return mapper.toDomain(savedEntity);
+	}
+
+	@Override
+	public Optional<User> findById(UUID id) {
+		return springDataRepository.findById(id).map(mapper::toDomain);
 	}
 
 	@Override

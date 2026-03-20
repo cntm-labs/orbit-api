@@ -151,3 +151,69 @@ for module in "${MODULES[@]}"; do
 
   echo "" >> "$OUTPUT"
 done
+
+# --- Section 5: Database Entity Relationships ---
+echo "## 5. Database Entity Relationships" >> "$OUTPUT"
+echo "" >> "$OUTPUT"
+echo '```mermaid' >> "$OUTPUT"
+echo "erDiagram" >> "$OUTPUT"
+
+# Build entity-to-table mapping using temp file (bash 3.2 compatible)
+ENTITY_MAP_TMP=$(mktemp)
+ENTITY_FILES=$(grep -rl "@Entity" "$SRC_DIR" 2>/dev/null | grep -v "Base\|SoftDeletable\|CreatedOnly")
+
+for file in $ENTITY_FILES; do
+  class_name=$(basename "$file" .java)
+  table_name=$(sed -n 's/.*@Table(name *= *"\([^"]*\)".*/\1/p' "$file" 2>/dev/null)
+  if [ -n "$table_name" ]; then
+    echo "${class_name}=${table_name}" >> "$ENTITY_MAP_TMP"
+  fi
+done
+
+# Helper: look up table name from entity class name
+get_table() {
+  local entity_class="$1"
+  sed -n "s/^${entity_class}=//p" "$ENTITY_MAP_TMP" | head -1
+}
+
+# Parse relationships
+ER_EDGE_TMP=$(mktemp)
+trap "rm -f $EDGE_TMP $ENTITY_MAP_TMP $ER_EDGE_TMP" EXIT
+
+for file in $ENTITY_FILES; do
+  class_name=$(basename "$file" .java)
+  source_table=$(get_table "$class_name")
+  [ -z "$source_table" ] && continue
+
+  # ManyToOne: scan for @ManyToOne then find next "private XxxEntity" line
+  m2o_targets=$(awk '/@ManyToOne/{found=1} found && /private .*Entity /{match($0, /private ([A-Za-z]*Entity)/, m); if(m[1]) print m[1]; found=0}' "$file" 2>/dev/null | sort -u)
+  # Fallback for BSD awk (no match with array)
+  if [ -z "$m2o_targets" ]; then
+    m2o_targets=$(awk '/@ManyToOne/{found=1} found && /private .*Entity /{for(i=1;i<=NF;i++){if($i ~ /Entity$/){print $i; break}}; found=0}' "$file" 2>/dev/null | sort -u)
+  fi
+  for target in $m2o_targets; do
+    target_table=$(get_table "$target")
+    [ -z "$target_table" ] && continue
+    edge_key="${source_table}|${target_table}|m2o"
+    if ! grep -qx "$edge_key" "$ER_EDGE_TMP" 2>/dev/null; then
+      echo "$edge_key" >> "$ER_EDGE_TMP"
+      echo "  ${target_table} ||--o{ ${source_table} : \"has\"" >> "$OUTPUT"
+    fi
+  done
+
+  # ManyToMany: scan for @ManyToMany then find next "private List<XxxEntity>" line
+  m2m_targets=$(awk '/@ManyToMany/{found=1} found && /private .*<.*Entity>/{gsub(/.*</, ""); gsub(/>.*/, ""); print; found=0}' "$file" 2>/dev/null | sort -u)
+  for target in $m2m_targets; do
+    target_table=$(get_table "$target")
+    [ -z "$target_table" ] && continue
+    edge_key="${source_table}|${target_table}|m2m"
+    if ! grep -qx "$edge_key" "$ER_EDGE_TMP" 2>/dev/null; then
+      echo "$edge_key" >> "$ER_EDGE_TMP"
+      echo "  ${source_table} }o--o{ ${target_table} : \"many-to-many\"" >> "$OUTPUT"
+    fi
+  done
+done
+
+rm -f "$ENTITY_MAP_TMP" "$ER_EDGE_TMP"
+echo '```' >> "$OUTPUT"
+echo "" >> "$OUTPUT"

@@ -217,3 +217,59 @@ done
 rm -f "$ENTITY_MAP_TMP" "$ER_EDGE_TMP"
 echo '```' >> "$OUTPUT"
 echo "" >> "$OUTPUT"
+
+# --- Section 6: API Endpoint Inventory ---
+echo "## 6. API Endpoint Inventory" >> "$OUTPUT"
+echo "" >> "$OUTPUT"
+
+CONTROLLER_FILES=$(grep -rl "@RestController" "$SRC_DIR" 2>/dev/null)
+
+for file in $CONTROLLER_FILES; do
+  # Determine module
+  module=$(echo "$file" | sed "s|$SRC_DIR/\([^/]*\)/.*|\1|")
+  class_name=$(basename "$file" .java)
+
+  # Extract base path from @RequestMapping
+  base_path=$(sed -n 's/.*@RequestMapping("\([^"]*\)".*/\1/p' "$file" 2>/dev/null | head -1)
+
+  echo "### $module — $class_name" >> "$OUTPUT"
+  echo "" >> "$OUTPUT"
+  echo "| Method | Path | Description |" >> "$OUTPUT"
+  echo "|--------|------|-------------|" >> "$OUTPUT"
+
+  # Use awk to correlate @*Mapping with @Operation summary (BSD awk compatible)
+  awk -v base="$base_path" '
+    /@(Get|Post|Put|Delete|Patch)Mapping/ {
+      # Extract HTTP method
+      method = ""
+      if (index($0, "@GetMapping")) method = "GET"
+      else if (index($0, "@PostMapping")) method = "POST"
+      else if (index($0, "@PutMapping")) method = "PUT"
+      else if (index($0, "@DeleteMapping")) method = "DELETE"
+      else if (index($0, "@PatchMapping")) method = "PATCH"
+
+      # Extract path from mapping annotation
+      path = ""
+      n = split($0, parts, "\"")
+      if (n >= 2) path = parts[2]
+      full_path = base path
+
+      # Read next line for @Operation summary
+      summary = ""
+      getline next_line
+      if (index(next_line, "summary")) {
+        n2 = split(next_line, sparts, "\"")
+        if (n2 >= 2) summary = sparts[2]
+      }
+
+      printf "| %s | `%s` | %s |\n", method, full_path, summary
+    }
+  ' "$file" >> "$OUTPUT"
+
+  # Count endpoints in this file
+  file_endpoints=$(grep -c "@\(Get\|Post\|Put\|Delete\|Patch\)Mapping" "$file" 2>/dev/null || echo "0")
+  file_endpoints=$(echo "$file_endpoints" | tr -d '[:space:]')
+  TOTAL_ENDPOINTS=$((TOTAL_ENDPOINTS + file_endpoints))
+
+  echo "" >> "$OUTPUT"
+done

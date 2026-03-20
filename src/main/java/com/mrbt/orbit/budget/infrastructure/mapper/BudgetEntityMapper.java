@@ -15,6 +15,7 @@ import com.mrbt.orbit.common.infrastructure.mapper.AbstractNullSafeMapper;
 @Component
 public class BudgetEntityMapper extends AbstractNullSafeMapper<BudgetEntity, Budget> {
 
+	@Override
 	public Budget toDomain(BudgetEntity entity) {
 		if (entity == null)
 			return null;
@@ -31,6 +32,7 @@ public class BudgetEntityMapper extends AbstractNullSafeMapper<BudgetEntity, Bud
 				.build();
 	}
 
+	@Override
 	public BudgetEntity toEntity(Budget domain) {
 		if (domain == null)
 			return null;

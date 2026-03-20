@@ -12,6 +12,7 @@ import com.mrbt.orbit.common.infrastructure.mapper.AbstractNullSafeMapper;
 @Component
 public class GoalEntityMapper extends AbstractNullSafeMapper<GoalEntity, Goal> {
 
+	@Override
 	public Goal toDomain(GoalEntity entity) {
 		if (entity == null)
 			return null;
@@ -25,6 +26,7 @@ public class GoalEntityMapper extends AbstractNullSafeMapper<GoalEntity, Goal> {
 				.build();
 	}
 
+	@Override
 	public GoalEntity toEntity(Goal domain) {
 		if (domain == null)
 			return null;

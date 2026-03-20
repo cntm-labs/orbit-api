@@ -273,3 +273,13 @@ for file in $CONTROLLER_FILES; do
 
   echo "" >> "$OUTPUT"
 done
+
+# --- Footer ---
+echo "---" >> "$OUTPUT"
+echo "*Auto-generated on $TIMESTAMP — ${#MODULES[@]} modules, $TOTAL_ENTITIES entities, $TOTAL_ENDPOINTS endpoints.*" >> "$OUTPUT"
+
+# Terminal summary
+echo "Architecture graph generated: $OUTPUT"
+echo "  Modules:   ${#MODULES[@]}"
+echo "  Entities:  $TOTAL_ENTITIES"
+echo "  Endpoints: $TOTAL_ENDPOINTS"

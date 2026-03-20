@@ -60,6 +60,8 @@ Each feature module under `src/main/java/com/mrbt/orbit/` follows this structure
 ```
 Feature packages: `audit`, `common`, `config`, `crypto`, `ledger`, `payment`, `security`.
 
+**Architecture Reference:** See `architect/architecture-graph.md` for the auto-generated module dependency map, entity relationships, and API inventory. Regenerate with `scripts/generate-architecture-graph.sh`.
+
 Cross-cutting concerns live in `common/` and `config/`.
 
 **Database:**

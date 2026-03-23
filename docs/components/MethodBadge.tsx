@@ -12,7 +12,7 @@ export default function MethodBadge({ method }: { method: string }) {
 	return (
 		<span
 			className={cn(
-				"font-mono text-xs font-semibold px-2.5 py-1 rounded-md border",
+				"inline-flex justify-center font-mono text-xs font-semibold w-[4.5rem] py-1 rounded-md border shrink-0",
 				methodColors[method] || "",
 			)}
 		>

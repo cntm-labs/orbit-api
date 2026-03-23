@@ -32,7 +32,7 @@ function MethodBadge({ method }: { method: string }) {
 	return (
 		<span
 			className={cn(
-				"font-mono text-[10px] px-1.5 py-0.5 rounded font-semibold",
+				"inline-flex justify-center font-mono text-[10px] w-14 py-0.5 rounded font-semibold shrink-0",
 				METHOD_COLORS[method],
 			)}
 		>

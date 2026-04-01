@@ -49,4 +49,26 @@ class GlobalExceptionHandlerTest {
 		assertThat(response.getBody().message()).isEqualTo("Amount cannot be zero");
 	}
 
+	@Test
+	void handleInvalidStateTransition_shouldReturn409() {
+		ResponseEntity<ApiResponse<Void>> response = handler.handleInvalidStateTransition(
+				new InvalidStateTransitionException("Subscription", "CANCELLED", "ACTIVE"));
+		assertThat(response.getStatusCode().value()).isEqualTo(409);
+		assertThat(response.getBody().message()).contains("CANCELLED");
+	}
+
+	@Test
+	void handleBusinessRuleViolation_shouldReturn422() {
+		ResponseEntity<ApiResponse<Void>> response = handler
+				.handleBusinessRuleViolation(new BusinessRuleViolationException("Amount cannot be zero"));
+		assertThat(response.getStatusCode().value()).isEqualTo(422);
+	}
+
+	@Test
+	void handleGenericException_shouldReturn500() {
+		ResponseEntity<ApiResponse<Void>> response = handler.handleGenericException(new RuntimeException("unexpected"));
+		assertThat(response.getStatusCode().value()).isEqualTo(500);
+		assertThat(response.getBody().message()).isEqualTo("An unexpected error occurred");
+	}
+
 }

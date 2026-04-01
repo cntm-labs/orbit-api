@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.mrbt.orbit.common.core.model.PageResult;
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.ledger.core.model.RecurringTransaction;
-import com.mrbt.orbit.ledger.core.model.enums.RecurringTransactionStatus;
 import com.mrbt.orbit.ledger.core.port.in.CreateRecurringTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.DeleteRecurringTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.GetRecurringTransactionUseCase;
@@ -33,12 +32,7 @@ public class RecurringTransactionService
 	@Override
 	@Transactional
 	public RecurringTransaction create(RecurringTransaction recurring) {
-		if (recurring.getStatus() == null) {
-			recurring.setStatus(RecurringTransactionStatus.ACTIVE);
-		}
-		if (recurring.getAutoConfirm() == null) {
-			recurring.setAutoConfirm(true);
-		}
+		recurring.applyDefaults();
 		return repositoryPort.save(recurring);
 	}
 
@@ -73,11 +67,7 @@ public class RecurringTransactionService
 	public RecurringTransaction togglePause(UUID id) {
 		RecurringTransaction recurring = repositoryPort.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("RecurringTransaction", "ID", id));
-		if (recurring.getStatus() == RecurringTransactionStatus.ACTIVE) {
-			recurring.setStatus(RecurringTransactionStatus.PAUSED);
-		} else if (recurring.getStatus() == RecurringTransactionStatus.PAUSED) {
-			recurring.setStatus(RecurringTransactionStatus.ACTIVE);
-		}
+		recurring.togglePause();
 		return repositoryPort.save(recurring);
 	}
 
@@ -86,7 +76,7 @@ public class RecurringTransactionService
 	public void cancel(UUID id) {
 		RecurringTransaction recurring = repositoryPort.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("RecurringTransaction", "ID", id));
-		recurring.setStatus(RecurringTransactionStatus.CANCELLED);
+		recurring.cancel();
 		repositoryPort.save(recurring);
 	}
 

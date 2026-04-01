@@ -30,4 +30,29 @@ public class Transaction extends BaseDomainModel {
 	private TransactionStatus status;
 	private String plaidTransactionId;
 	private Boolean isReviewed;
+
+	public void voidTransaction() {
+		this.status = TransactionStatus.VOIDED;
+	}
+
+	public boolean isValidAmount() {
+		return this.amount != null && this.amount.compareTo(BigDecimal.ZERO) != 0;
+	}
+
+	public boolean isCompleted() {
+		return this.status == TransactionStatus.COMPLETED;
+	}
+
+	public void applyDefaults() {
+		if (this.status == null) {
+			this.status = TransactionStatus.COMPLETED;
+		}
+		if (this.isReviewed == null) {
+			this.isReviewed = false;
+		}
+		if (this.exchangeRate == null) {
+			this.exchangeRate = BigDecimal.ONE;
+		}
+	}
+
 }

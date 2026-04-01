@@ -45,4 +45,20 @@ public class Subscription extends BaseDomainModel {
 
 	private LocalDate trialEndDate;
 
+	public void togglePause() {
+		this.status = (this.status == SubscriptionStatus.ACTIVE)
+				? SubscriptionStatus.PAUSED
+				: SubscriptionStatus.ACTIVE;
+	}
+
+	public void applyDefaults() {
+		if (this.status == null) {
+			this.status = SubscriptionStatus.ACTIVE;
+		}
+	}
+
+	public void cancel() {
+		this.status = SubscriptionStatus.CANCELLED;
+	}
+
 }

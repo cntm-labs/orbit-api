@@ -1,7 +1,7 @@
 package com.mrbt.orbit.ledger.api;
 
 import com.mrbt.orbit.common.api.ApiResponse;
-import com.mrbt.orbit.common.api.PaginationParams;
+import com.mrbt.orbit.common.api.PaginationHelper;
 import com.mrbt.orbit.common.core.model.PageResult;
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.ledger.api.request.CreateTransactionRequest;
@@ -61,13 +61,8 @@ public class TransactionController {
 	public ResponseEntity<ApiResponse<PageResult<TransactionResponse>>> getTransactionsByAccountId(
 			@PathVariable UUID accountId, @RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "20") int size) {
-		PaginationParams pagination = PaginationParams.of(page, size);
-		PageResult<Transaction> result = getTransactionUseCase.getTransactionsByAccountId(accountId, pagination.page(),
-				pagination.size());
-		PageResult<TransactionResponse> responses = new PageResult<>(dtoMapper.toResponseList(result.content()),
-				result.totalElements(), result.totalPages(), result.page(), result.size());
-
-		return ResponseEntity.ok(ApiResponse.success(responses));
+		return PaginationHelper.paginated(page, size,
+				(p, s) -> getTransactionUseCase.getTransactionsByAccountId(accountId, p, s), dtoMapper::toResponseList);
 	}
 
 	@PatchMapping("/{transactionId}")

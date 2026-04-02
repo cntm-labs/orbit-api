@@ -1,7 +1,7 @@
 package com.mrbt.orbit.ledger.api;
 
 import com.mrbt.orbit.common.api.ApiResponse;
-import com.mrbt.orbit.common.api.PaginationParams;
+import com.mrbt.orbit.common.api.PaginationHelper;
 import com.mrbt.orbit.common.core.model.PageResult;
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.ledger.api.request.CreateRecurringTransactionRequest;
@@ -60,12 +60,8 @@ public class RecurringTransactionController {
 	@Operation(summary = "Get recurring transactions for a user", description = "Returns paginated recurring transaction rules")
 	public ResponseEntity<ApiResponse<PageResult<RecurringTransactionResponse>>> getByUserId(@PathVariable UUID userId,
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
-		PaginationParams pagination = PaginationParams.of(page, size);
-		PageResult<RecurringTransaction> result = getUseCase.findByUserId(userId, pagination.page(), pagination.size());
-		PageResult<RecurringTransactionResponse> responses = new PageResult<>(
-				dtoMapper.toResponseList(result.content()), result.totalElements(), result.totalPages(), result.page(),
-				result.size());
-		return ResponseEntity.ok(ApiResponse.success(responses));
+		return PaginationHelper.paginated(page, size, (p, s) -> getUseCase.findByUserId(userId, p, s),
+				dtoMapper::toResponseList);
 	}
 
 	@PatchMapping("/{id}")

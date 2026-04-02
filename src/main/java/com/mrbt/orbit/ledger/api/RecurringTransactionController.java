@@ -12,7 +12,7 @@ import com.mrbt.orbit.ledger.core.port.in.CreateRecurringTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.DeleteRecurringTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.GetRecurringTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.UpdateRecurringTransactionUseCase;
-import com.mrbt.orbit.ledger.infrastructure.mapper.RecurringTransactionMapper;
+import com.mrbt.orbit.ledger.api.mapper.RecurringTransactionDtoMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -33,7 +33,7 @@ public class RecurringTransactionController {
 	private final GetRecurringTransactionUseCase getUseCase;
 	private final UpdateRecurringTransactionUseCase updateUseCase;
 	private final DeleteRecurringTransactionUseCase deleteUseCase;
-	private final RecurringTransactionMapper mapper;
+	private final RecurringTransactionDtoMapper dtoMapper;
 
 	@PostMapping
 	@Operation(summary = "Create recurring transaction rule", description = "Creates a new recurring transaction schedule")
@@ -45,7 +45,7 @@ public class RecurringTransactionController {
 				.nextOccurrence(request.startDate()).autoConfirm(request.autoConfirm()).build();
 		RecurringTransaction created = createUseCase.create(recurring);
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(ApiResponse.success("Recurring transaction created", mapper.toResponse(created)));
+				.body(ApiResponse.success("Recurring transaction created", dtoMapper.toResponse(created)));
 	}
 
 	@GetMapping("/{id}")
@@ -53,7 +53,7 @@ public class RecurringTransactionController {
 	public ResponseEntity<ApiResponse<RecurringTransactionResponse>> getById(@PathVariable UUID id) {
 		RecurringTransaction recurring = getUseCase.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("RecurringTransaction", "ID", id));
-		return ResponseEntity.ok(ApiResponse.success(mapper.toResponse(recurring)));
+		return ResponseEntity.ok(ApiResponse.success(dtoMapper.toResponse(recurring)));
 	}
 
 	@GetMapping("/user/{userId}")
@@ -62,8 +62,9 @@ public class RecurringTransactionController {
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
 		PaginationParams pagination = PaginationParams.of(page, size);
 		PageResult<RecurringTransaction> result = getUseCase.findByUserId(userId, pagination.page(), pagination.size());
-		PageResult<RecurringTransactionResponse> responses = new PageResult<>(mapper.toResponseList(result.content()),
-				result.totalElements(), result.totalPages(), result.page(), result.size());
+		PageResult<RecurringTransactionResponse> responses = new PageResult<>(
+				dtoMapper.toResponseList(result.content()), result.totalElements(), result.totalPages(), result.page(),
+				result.size());
 		return ResponseEntity.ok(ApiResponse.success(responses));
 	}
 
@@ -73,14 +74,14 @@ public class RecurringTransactionController {
 			@Valid @RequestBody UpdateRecurringTransactionRequest request) {
 		RecurringTransaction updated = updateUseCase.update(id, request.description(), request.amount(),
 				request.categoryId());
-		return ResponseEntity.ok(ApiResponse.success("Recurring transaction updated", mapper.toResponse(updated)));
+		return ResponseEntity.ok(ApiResponse.success("Recurring transaction updated", dtoMapper.toResponse(updated)));
 	}
 
 	@PatchMapping("/{id}/pause")
 	@Operation(summary = "Toggle pause/resume", description = "Toggles a recurring transaction between ACTIVE and PAUSED")
 	public ResponseEntity<ApiResponse<RecurringTransactionResponse>> togglePause(@PathVariable UUID id) {
 		RecurringTransaction updated = updateUseCase.togglePause(id);
-		return ResponseEntity.ok(ApiResponse.success("Status toggled", mapper.toResponse(updated)));
+		return ResponseEntity.ok(ApiResponse.success("Status toggled", dtoMapper.toResponse(updated)));
 	}
 
 	@DeleteMapping("/{id}")

@@ -33,11 +33,11 @@ import com.mrbt.orbit.ledger.core.port.in.CreateCategoryUseCase;
 import com.mrbt.orbit.ledger.core.port.in.DeleteCategoryUseCase;
 import com.mrbt.orbit.ledger.core.port.in.GetCategoryUseCase;
 import com.mrbt.orbit.ledger.core.port.in.UpdateCategoryUseCase;
-import com.mrbt.orbit.ledger.infrastructure.mapper.CategoryMapper;
+import com.mrbt.orbit.ledger.api.mapper.CategoryDtoMapper;
 
 @WebMvcTest(CategoryController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@Import(CategoryMapper.class)
+@Import(CategoryDtoMapper.class)
 class CategoryControllerTest {
 
 	@Autowired

@@ -40,7 +40,7 @@ import com.mrbt.orbit.ledger.core.port.in.CreateRecurringTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.DeleteRecurringTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.GetRecurringTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.UpdateRecurringTransactionUseCase;
-import com.mrbt.orbit.ledger.infrastructure.mapper.RecurringTransactionMapper;
+import com.mrbt.orbit.ledger.api.mapper.RecurringTransactionDtoMapper;
 
 @WebMvcTest(RecurringTransactionController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -64,7 +64,7 @@ class RecurringTransactionControllerTest {
 	private DeleteRecurringTransactionUseCase deleteUseCase;
 
 	@MockitoBean
-	private RecurringTransactionMapper mapper;
+	private RecurringTransactionDtoMapper dtoMapper;
 
 	private RecurringTransactionResponse buildResponse(UUID id) {
 		return RecurringTransactionResponse.builder().id(id).userId(UUID.randomUUID()).accountId(UUID.randomUUID())
@@ -85,7 +85,7 @@ class RecurringTransactionControllerTest {
 			r.setAutoConfirm(true);
 			return r;
 		});
-		when(mapper.toResponse(any(RecurringTransaction.class))).thenReturn(response);
+		when(dtoMapper.toResponse(any(RecurringTransaction.class))).thenReturn(response);
 
 		CreateRecurringTransactionRequest request = CreateRecurringTransactionRequest.builder()
 				.userId(UUID.randomUUID()).accountId(UUID.randomUUID()).categoryId(UUID.randomUUID())
@@ -108,7 +108,7 @@ class RecurringTransactionControllerTest {
 		RecurringTransactionResponse response = buildResponse(id);
 
 		when(getUseCase.findById(id)).thenReturn(Optional.of(recurring));
-		when(mapper.toResponse(any(RecurringTransaction.class))).thenReturn(response);
+		when(dtoMapper.toResponse(any(RecurringTransaction.class))).thenReturn(response);
 
 		mockMvc.perform(get("/api/v1/recurring-transactions/{id}", id)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.success").value(true)).andExpect(jsonPath("$.data.id").value(id.toString()));
@@ -134,7 +134,7 @@ class RecurringTransactionControllerTest {
 		RecurringTransactionResponse response = buildResponse(recurring.getId());
 
 		when(getUseCase.findByUserId(eq(userId), anyInt(), anyInt())).thenReturn(page);
-		when(mapper.toResponseList(any())).thenReturn(List.of(response));
+		when(dtoMapper.toResponseList(any())).thenReturn(List.of(response));
 
 		mockMvc.perform(get("/api/v1/recurring-transactions/user/{userId}", userId)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.success").value(true)).andExpect(jsonPath("$.data.content").isArray())
@@ -153,7 +153,7 @@ class RecurringTransactionControllerTest {
 				.description("Updated rent").amount(new BigDecimal("200.00")).status("ACTIVE").build();
 
 		when(updateUseCase.update(eq(id), eq("Updated rent"), isNull(), isNull())).thenReturn(updated);
-		when(mapper.toResponse(any(RecurringTransaction.class))).thenReturn(response);
+		when(dtoMapper.toResponse(any(RecurringTransaction.class))).thenReturn(response);
 
 		UpdateRecurringTransactionRequest request = UpdateRecurringTransactionRequest.builder()
 				.description("Updated rent").build();
@@ -174,7 +174,7 @@ class RecurringTransactionControllerTest {
 		RecurringTransactionResponse response = RecurringTransactionResponse.builder().id(id).status("PAUSED").build();
 
 		when(updateUseCase.togglePause(id)).thenReturn(paused);
-		when(mapper.toResponse(any(RecurringTransaction.class))).thenReturn(response);
+		when(dtoMapper.toResponse(any(RecurringTransaction.class))).thenReturn(response);
 
 		mockMvc.perform(patch("/api/v1/recurring-transactions/{id}/pause", id)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.success").value(true)).andExpect(jsonPath("$.data.status").value("PAUSED"));

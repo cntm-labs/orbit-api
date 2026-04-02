@@ -37,11 +37,11 @@ import com.mrbt.orbit.ledger.core.port.in.CreateTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.DeleteTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.GetTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.UpdateTransactionUseCase;
-import com.mrbt.orbit.ledger.infrastructure.mapper.TransactionMapper;
+import com.mrbt.orbit.ledger.api.mapper.TransactionDtoMapper;
 
 @WebMvcTest(TransactionController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@Import(TransactionMapper.class)
+@Import(TransactionDtoMapper.class)
 class TransactionControllerTest {
 
 	@Autowired

@@ -12,7 +12,7 @@ import com.mrbt.orbit.ledger.core.port.in.CreateTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.DeleteTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.GetTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.UpdateTransactionUseCase;
-import com.mrbt.orbit.ledger.infrastructure.mapper.TransactionMapper;
+import com.mrbt.orbit.ledger.api.mapper.TransactionDtoMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -33,15 +33,15 @@ public class TransactionController {
 	private final GetTransactionUseCase getTransactionUseCase;
 	private final UpdateTransactionUseCase updateTransactionUseCase;
 	private final DeleteTransactionUseCase deleteTransactionUseCase;
-	private final TransactionMapper transactionMapper;
+	private final TransactionDtoMapper dtoMapper;
 
 	@PostMapping
 	@Operation(summary = "Create a transaction", description = "Records a new financial transaction. Automatically updates the associated account's balance.")
 	public ResponseEntity<ApiResponse<TransactionResponse>> createTransaction(
 			@Valid @RequestBody CreateTransactionRequest request) {
-		Transaction domainTransaction = transactionMapper.toDomain(request);
+		Transaction domainTransaction = dtoMapper.toDomain(request);
 		Transaction createdTransaction = createTransactionUseCase.createTransaction(domainTransaction);
-		TransactionResponse response = transactionMapper.toResponse(createdTransaction);
+		TransactionResponse response = dtoMapper.toResponse(createdTransaction);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(ApiResponse.success("Transaction recorded successfully", response));
@@ -53,7 +53,7 @@ public class TransactionController {
 		Transaction transaction = getTransactionUseCase.getTransactionById(transactionId)
 				.orElseThrow(() -> new ResourceNotFoundException("Transaction", "ID", transactionId));
 
-		return ResponseEntity.ok(ApiResponse.success(transactionMapper.toResponse(transaction)));
+		return ResponseEntity.ok(ApiResponse.success(dtoMapper.toResponse(transaction)));
 	}
 
 	@GetMapping("/account/{accountId}")
@@ -64,7 +64,7 @@ public class TransactionController {
 		PaginationParams pagination = PaginationParams.of(page, size);
 		PageResult<Transaction> result = getTransactionUseCase.getTransactionsByAccountId(accountId, pagination.page(),
 				pagination.size());
-		PageResult<TransactionResponse> responses = new PageResult<>(transactionMapper.toResponseList(result.content()),
+		PageResult<TransactionResponse> responses = new PageResult<>(dtoMapper.toResponseList(result.content()),
 				result.totalElements(), result.totalPages(), result.page(), result.size());
 
 		return ResponseEntity.ok(ApiResponse.success(responses));
@@ -76,7 +76,7 @@ public class TransactionController {
 			@Valid @RequestBody UpdateTransactionRequest request) {
 		Transaction updated = updateTransactionUseCase.updateTransaction(transactionId, request.description(),
 				request.categoryId(), request.isReviewed());
-		return ResponseEntity.ok(ApiResponse.success("Transaction updated", transactionMapper.toResponse(updated)));
+		return ResponseEntity.ok(ApiResponse.success("Transaction updated", dtoMapper.toResponse(updated)));
 	}
 
 	@DeleteMapping("/{transactionId}")

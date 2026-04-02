@@ -12,7 +12,6 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import com.mrbt.orbit.ledger.api.response.RecurringTransactionResponse;
 import com.mrbt.orbit.ledger.core.model.RecurringTransaction;
 import com.mrbt.orbit.ledger.core.model.enums.Frequency;
 import com.mrbt.orbit.ledger.core.model.enums.RecurringTransactionStatus;
@@ -127,58 +126,6 @@ class RecurringTransactionMapperTest {
 	@Test
 	void toDomainList_returnsNullForNull() {
 		assertThat(mapper.toDomainList(null)).isNull();
-	}
-
-	@Test
-	void toResponse_mapsAllFields() {
-		OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-		RecurringTransaction domain = RecurringTransaction.builder().id(UUID.randomUUID()).userId(UUID.randomUUID())
-				.accountId(UUID.randomUUID()).categoryId(UUID.randomUUID()).amount(new BigDecimal("250.00"))
-				.currencyCode("EUR").description("Netflix").frequency(Frequency.MONTHLY)
-				.nextOccurrence(LocalDate.of(2026, 4, 15)).autoConfirm(true).status(RecurringTransactionStatus.ACTIVE)
-				.createdAt(now).updatedAt(now).build();
-
-		RecurringTransactionResponse result = mapper.toResponse(domain);
-
-		assertThat(result.id()).isEqualTo(domain.getId());
-		assertThat(result.frequency()).isEqualTo("MONTHLY");
-		assertThat(result.status()).isEqualTo("ACTIVE");
-		assertThat(result.amount()).isEqualByComparingTo("250.00");
-		assertThat(result.description()).isEqualTo("Netflix");
-	}
-
-	@Test
-	void toResponse_returnsNullForNull() {
-		assertThat(mapper.toResponse(null)).isNull();
-	}
-
-	@Test
-	void toResponse_handlesNullEnums() {
-		RecurringTransaction domain = RecurringTransaction.builder().description("Minimal").build();
-
-		RecurringTransactionResponse result = mapper.toResponse(domain);
-
-		assertThat(result.frequency()).isNull();
-		assertThat(result.status()).isNull();
-	}
-
-	@Test
-	void toResponseList_convertsList() {
-		List<RecurringTransaction> domains = List.of(
-				RecurringTransaction.builder().description("A").frequency(Frequency.WEEKLY)
-						.status(RecurringTransactionStatus.ACTIVE).build(),
-				RecurringTransaction.builder().description("B").frequency(Frequency.MONTHLY)
-						.status(RecurringTransactionStatus.PAUSED).build());
-
-		List<RecurringTransactionResponse> result = mapper.toResponseList(domains);
-
-		assertThat(result).hasSize(2);
-		assertThat(result.get(0).description()).isEqualTo("A");
-	}
-
-	@Test
-	void toResponseList_returnsNullForNull() {
-		assertThat(mapper.toResponseList(null)).isNull();
 	}
 
 }

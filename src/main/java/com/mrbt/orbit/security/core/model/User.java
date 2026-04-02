@@ -21,4 +21,9 @@ public class User extends BaseDomainModel {
 	private String baseCurrency;
 	private String timezone;
 	private UserStatus status;
+
+	public void deactivate() {
+		this.status = UserStatus.DEACTIVATED;
+	}
+
 }

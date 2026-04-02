@@ -21,35 +21,35 @@ import com.mrbt.orbit.security.core.model.enums.UserStatus;
 import com.mrbt.orbit.security.core.port.out.UserRepositoryPort;
 
 @ExtendWith(MockitoExtension.class)
-class UpdateUserServiceTest {
+class DeactivateUserServiceTest {
 
 	@Mock
 	private UserRepositoryPort userRepositoryPort;
 
 	@InjectMocks
-	private UpdateUserService updateUserService;
+	private DeactivateUserService deactivateUserService;
 
 	@Test
-	void updateUser_updatesFields() {
+	void deactivateUser_setsStatusToDeactivated() {
 		UUID userId = UUID.randomUUID();
-		User user = User.builder().id(userId).firstName("John").lastName("Doe").email("john@test.com")
-				.status(UserStatus.ACTIVE).build();
+		User user = User.builder().id(userId).firstName("John").email("john@test.com").status(UserStatus.ACTIVE)
+				.build();
 
 		when(userRepositoryPort.findById(userId)).thenReturn(Optional.of(user));
 		when(userRepositoryPort.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-		User result = updateUserService.updateUser(userId, "Jane", null, null, null);
+		deactivateUserService.deactivateUser(userId);
 
-		assertThat(result.getFirstName()).isEqualTo("Jane");
+		assertThat(user.getStatus()).isEqualTo(UserStatus.DEACTIVATED);
 		verify(userRepositoryPort).save(user);
 	}
 
 	@Test
-	void updateUser_throwsWhenNotFound() {
+	void deactivateUser_throwsWhenNotFound() {
 		UUID userId = UUID.randomUUID();
 		when(userRepositoryPort.findById(userId)).thenReturn(Optional.empty());
 
-		assertThatThrownBy(() -> updateUserService.updateUser(userId, "Jane", null, null, null))
+		assertThatThrownBy(() -> deactivateUserService.deactivateUser(userId))
 				.isInstanceOf(ResourceNotFoundException.class);
 	}
 

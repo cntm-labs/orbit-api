@@ -2,8 +2,6 @@ package com.mrbt.orbit.security.core.service;
 
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.security.core.model.User;
-import com.mrbt.orbit.security.core.model.enums.UserStatus;
-import com.mrbt.orbit.security.core.port.in.DeleteUserUseCase;
 import com.mrbt.orbit.security.core.port.in.UpdateUserUseCase;
 import com.mrbt.orbit.security.core.port.out.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +12,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class UpdateUserService implements UpdateUserUseCase, DeleteUserUseCase {
+public class UpdateUserService implements UpdateUserUseCase {
 
 	private final UserRepositoryPort userRepositoryPort;
 
@@ -32,15 +30,6 @@ public class UpdateUserService implements UpdateUserUseCase, DeleteUserUseCase {
 		if (timezone != null)
 			user.setTimezone(timezone);
 		return userRepositoryPort.save(user);
-	}
-
-	@Override
-	@Transactional
-	public void deactivateUser(UUID userId) {
-		User user = userRepositoryPort.findById(userId)
-				.orElseThrow(() -> new ResourceNotFoundException("User", "ID", userId));
-		user.setStatus(UserStatus.DEACTIVATED);
-		userRepositoryPort.save(user);
 	}
 
 }

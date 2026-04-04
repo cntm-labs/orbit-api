@@ -9,7 +9,7 @@ import com.mrbt.orbit.ledger.core.port.in.CreateCategoryUseCase;
 import com.mrbt.orbit.ledger.core.port.in.DeleteCategoryUseCase;
 import com.mrbt.orbit.ledger.core.port.in.GetCategoryUseCase;
 import com.mrbt.orbit.ledger.core.port.in.UpdateCategoryUseCase;
-import com.mrbt.orbit.ledger.infrastructure.mapper.CategoryMapper;
+import com.mrbt.orbit.ledger.api.mapper.CategoryDtoMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -32,7 +32,7 @@ public class CategoryController {
 	private final GetCategoryUseCase getCategoryUseCase;
 	private final UpdateCategoryUseCase updateCategoryUseCase;
 	private final DeleteCategoryUseCase deleteCategoryUseCase;
-	private final CategoryMapper categoryMapper;
+	private final CategoryDtoMapper dtoMapper;
 
 	@PostMapping
 	@Operation(summary = "Create a category", description = "Creates a new category. If userId is omitted, it becomes a system category.")
@@ -42,7 +42,7 @@ public class CategoryController {
 				.icon(request.icon()).color(request.color()).parentCategoryId(request.parentCategoryId()).build();
 
 		Category createdCategory = createCategoryUseCase.createCategory(domainCategory);
-		CategoryResponse response = categoryMapper.toResponse(createdCategory);
+		CategoryResponse response = dtoMapper.toResponse(createdCategory);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(ApiResponse.success("Category created successfully", response));
@@ -52,8 +52,7 @@ public class CategoryController {
 	@Operation(summary = "Get system categories", description = "Retrieves all default system categories available to all users")
 	public ResponseEntity<ApiResponse<List<CategoryResponse>>> getSystemCategories() {
 		List<Category> categories = getCategoryUseCase.getSystemCategories();
-		List<CategoryResponse> responses = categories.stream().map(categoryMapper::toResponse)
-				.collect(Collectors.toList());
+		List<CategoryResponse> responses = categories.stream().map(dtoMapper::toResponse).collect(Collectors.toList());
 
 		return ResponseEntity.ok(ApiResponse.success(responses));
 	}
@@ -62,8 +61,7 @@ public class CategoryController {
 	@Operation(summary = "Get user categories", description = "Retrieves all custom categories created by a specific user")
 	public ResponseEntity<ApiResponse<List<CategoryResponse>>> getUserCategories(@PathVariable UUID userId) {
 		List<Category> categories = getCategoryUseCase.getUserCategories(userId);
-		List<CategoryResponse> responses = categories.stream().map(categoryMapper::toResponse)
-				.collect(Collectors.toList());
+		List<CategoryResponse> responses = categories.stream().map(dtoMapper::toResponse).collect(Collectors.toList());
 
 		return ResponseEntity.ok(ApiResponse.success(responses));
 	}
@@ -73,7 +71,7 @@ public class CategoryController {
 	public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(@PathVariable UUID categoryId,
 			@Valid @RequestBody UpdateCategoryRequest request) {
 		Category updated = updateCategoryUseCase.updateCategory(categoryId, request.name(), request.parentCategoryId());
-		return ResponseEntity.ok(ApiResponse.success("Category updated", categoryMapper.toResponse(updated)));
+		return ResponseEntity.ok(ApiResponse.success("Category updated", dtoMapper.toResponse(updated)));
 	}
 
 	@DeleteMapping("/{categoryId}")

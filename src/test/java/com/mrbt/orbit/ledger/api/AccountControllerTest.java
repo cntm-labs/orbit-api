@@ -34,11 +34,11 @@ import com.mrbt.orbit.ledger.core.port.in.CreateAccountUseCase;
 import com.mrbt.orbit.ledger.core.port.in.DeleteAccountUseCase;
 import com.mrbt.orbit.ledger.core.port.in.GetAccountUseCase;
 import com.mrbt.orbit.ledger.core.port.in.UpdateAccountUseCase;
-import com.mrbt.orbit.ledger.infrastructure.mapper.AccountMapper;
+import com.mrbt.orbit.ledger.api.mapper.AccountDtoMapper;
 
 @WebMvcTest(AccountController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@Import(AccountMapper.class)
+@Import(AccountDtoMapper.class)
 class AccountControllerTest {
 
 	@Autowired

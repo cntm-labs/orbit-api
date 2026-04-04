@@ -1,7 +1,5 @@
 package com.mrbt.orbit.budget.core.service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.ZoneOffset;
 import java.util.List;
 
@@ -33,20 +31,12 @@ public class BudgetEventListener {
 		for (BudgetItem item : items) {
 			budgetRepositoryPort.updateSpentAmount(item.getId(), event.amount().abs());
 
-			if (item.getAlertThresholdPct() != null) {
-				BigDecimal newSpent = item.getSpentAmount().add(event.amount().abs());
-				BigDecimal pct = newSpent.multiply(BigDecimal.valueOf(100)).divide(item.getAllocatedAmount(), 0,
-						RoundingMode.HALF_UP);
-
-				if (pct.intValue() >= item.getAlertThresholdPct()) {
-					budgetRepositoryPort.findById(item.getBudgetId())
-							.ifPresent(budget -> createNotificationUseCase
-									.createNotification(Notification.builder().userId(budget.getUserId())
-											.type(NotificationType.BUDGET_ALERT).title("Budget Alert")
-											.message(String.format("You've spent %d%% of your budget for this category",
-													pct.intValue()))
-											.channel(NotificationChannel.IN_APP).isRead(false).build()));
-				}
+			if (item.isAlertThresholdExceeded(event.amount().abs())) {
+				budgetRepositoryPort.findById(item.getBudgetId())
+						.ifPresent(budget -> createNotificationUseCase.createNotification(Notification.builder()
+								.userId(budget.getUserId()).type(NotificationType.BUDGET_ALERT).title("Budget Alert")
+								.message("You've exceeded your budget alert threshold for this category")
+								.channel(NotificationChannel.IN_APP).isRead(false).build()));
 			}
 		}
 	}

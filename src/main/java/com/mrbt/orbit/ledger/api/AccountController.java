@@ -10,7 +10,7 @@ import com.mrbt.orbit.ledger.core.port.in.CreateAccountUseCase;
 import com.mrbt.orbit.ledger.core.port.in.DeleteAccountUseCase;
 import com.mrbt.orbit.ledger.core.port.in.GetAccountUseCase;
 import com.mrbt.orbit.ledger.core.port.in.UpdateAccountUseCase;
-import com.mrbt.orbit.ledger.infrastructure.mapper.AccountMapper;
+import com.mrbt.orbit.ledger.api.mapper.AccountDtoMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -32,15 +32,15 @@ public class AccountController {
 	private final GetAccountUseCase getAccountUseCase;
 	private final UpdateAccountUseCase updateAccountUseCase;
 	private final DeleteAccountUseCase deleteAccountUseCase;
-	private final AccountMapper accountMapper;
+	private final AccountDtoMapper dtoMapper;
 
 	@PostMapping
 	@Operation(summary = "Create a new account", description = "Creates a new financial account for a specific user")
 	public ResponseEntity<ApiResponse<AccountResponse>> createAccount(
 			@Valid @RequestBody CreateAccountRequest request) {
-		Account domainAccount = accountMapper.toDomain(request);
+		Account domainAccount = dtoMapper.toDomain(request);
 		Account createdAccount = createAccountUseCase.createAccount(domainAccount);
-		AccountResponse response = accountMapper.toResponse(createdAccount);
+		AccountResponse response = dtoMapper.toResponse(createdAccount);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(ApiResponse.success("Account created successfully", response));
@@ -52,14 +52,14 @@ public class AccountController {
 		Account account = getAccountUseCase.getAccountById(accountId)
 				.orElseThrow(() -> new ResourceNotFoundException("Account", "ID", accountId));
 
-		return ResponseEntity.ok(ApiResponse.success(accountMapper.toResponse(account)));
+		return ResponseEntity.ok(ApiResponse.success(dtoMapper.toResponse(account)));
 	}
 
 	@GetMapping("/user/{userId}")
 	@Operation(summary = "Get all accounts for a user", description = "Retrieves all accounts belonging to a specific user")
 	public ResponseEntity<ApiResponse<List<AccountResponse>>> getAccountsByUserId(@PathVariable UUID userId) {
 		List<Account> accounts = getAccountUseCase.getAccountsByUserId(userId);
-		List<AccountResponse> responses = accountMapper.toResponseList(accounts);
+		List<AccountResponse> responses = dtoMapper.toResponseList(accounts);
 
 		return ResponseEntity.ok(ApiResponse.success(responses));
 	}
@@ -69,7 +69,7 @@ public class AccountController {
 	public ResponseEntity<ApiResponse<AccountResponse>> updateAccount(@PathVariable UUID accountId,
 			@Valid @RequestBody UpdateAccountRequest request) {
 		Account updated = updateAccountUseCase.updateAccount(accountId, request.name());
-		return ResponseEntity.ok(ApiResponse.success("Account updated", accountMapper.toResponse(updated)));
+		return ResponseEntity.ok(ApiResponse.success("Account updated", dtoMapper.toResponse(updated)));
 	}
 
 	@DeleteMapping("/{accountId}")

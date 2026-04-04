@@ -28,4 +28,30 @@ public class Budget extends BaseDomainModel {
 	private BigDecimal totalAmount;
 	private BudgetStatus status;
 	private List<BudgetItem> items;
+
+	public void applyDefaults() {
+		if (this.status == null) {
+			this.status = BudgetStatus.ACTIVE;
+		}
+	}
+
+	public void initializeItems() {
+		if (this.items != null) {
+			for (BudgetItem item : this.items) {
+				if (item.getSpentAmount() == null) {
+					item.setSpentAmount(BigDecimal.ZERO);
+				}
+			}
+		}
+	}
+
+	public void calculateTotalAmount() {
+		if (this.items == null) {
+			this.totalAmount = BigDecimal.ZERO;
+			return;
+		}
+		this.totalAmount = this.items.stream().map(BudgetItem::getAllocatedAmount).reduce(BigDecimal.ZERO,
+				BigDecimal::add);
+	}
+
 }

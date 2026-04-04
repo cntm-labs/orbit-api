@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.mrbt.orbit.ledger.api.response.RecurringTransactionResponse;
 import com.mrbt.orbit.ledger.core.model.RecurringTransaction;
 import com.mrbt.orbit.ledger.infrastructure.entity.RecurringTransactionEntity;
 
@@ -47,24 +46,6 @@ public class RecurringTransactionMapper {
 		if (entities == null)
 			return null;
 		return entities.stream().map(this::toDomain).toList();
-	}
-
-	public RecurringTransactionResponse toResponse(RecurringTransaction domain) {
-		if (domain == null)
-			return null;
-		return RecurringTransactionResponse.builder().id(domain.getId()).userId(domain.getUserId())
-				.accountId(domain.getAccountId()).categoryId(domain.getCategoryId()).amount(domain.getAmount())
-				.currencyCode(domain.getCurrencyCode()).description(domain.getDescription())
-				.frequency(domain.getFrequency() != null ? domain.getFrequency().name() : null)
-				.nextOccurrence(domain.getNextOccurrence()).autoConfirm(domain.getAutoConfirm())
-				.status(domain.getStatus() != null ? domain.getStatus().name() : null).createdAt(domain.getCreatedAt())
-				.updatedAt(domain.getUpdatedAt()).build();
-	}
-
-	public List<RecurringTransactionResponse> toResponseList(List<RecurringTransaction> domains) {
-		if (domains == null)
-			return null;
-		return domains.stream().map(this::toResponse).toList();
 	}
 
 }

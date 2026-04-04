@@ -53,28 +53,4 @@ class UpdateUserServiceTest {
 				.isInstanceOf(ResourceNotFoundException.class);
 	}
 
-	@Test
-	void deactivateUser_setsStatusToDeactivated() {
-		UUID userId = UUID.randomUUID();
-		User user = User.builder().id(userId).firstName("John").email("john@test.com").status(UserStatus.ACTIVE)
-				.build();
-
-		when(userRepositoryPort.findById(userId)).thenReturn(Optional.of(user));
-		when(userRepositoryPort.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
-
-		updateUserService.deactivateUser(userId);
-
-		assertThat(user.getStatus()).isEqualTo(UserStatus.DEACTIVATED);
-		verify(userRepositoryPort).save(user);
-	}
-
-	@Test
-	void deactivateUser_throwsWhenNotFound() {
-		UUID userId = UUID.randomUUID();
-		when(userRepositoryPort.findById(userId)).thenReturn(Optional.empty());
-
-		assertThatThrownBy(() -> updateUserService.deactivateUser(userId))
-				.isInstanceOf(ResourceNotFoundException.class);
-	}
-
 }

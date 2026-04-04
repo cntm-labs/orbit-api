@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import com.mrbt.orbit.ledger.api.response.CategoryResponse;
 import com.mrbt.orbit.ledger.core.model.Category;
 import com.mrbt.orbit.ledger.core.model.enums.CategoryType;
 import com.mrbt.orbit.ledger.infrastructure.entity.CategoryEntity;
@@ -83,35 +82,6 @@ class CategoryMapperTest {
 	@Test
 	void toEntity_returnsNullForNull() {
 		assertThat(mapper.toEntity(null)).isNull();
-	}
-
-	@Test
-	void toResponse_mapsAllFields() {
-		UUID id = UUID.randomUUID();
-		UUID parentId = UUID.randomUUID();
-		Category domain = Category.builder().id(id).userId(UUID.randomUUID()).name("Food").type(CategoryType.EXPENSE)
-				.icon("utensils").color("#FF5733").isSystem(false).parentCategoryId(parentId).build();
-
-		CategoryResponse result = mapper.toResponse(domain);
-
-		assertThat(result.id()).isEqualTo(id);
-		assertThat(result.name()).isEqualTo("Food");
-		assertThat(result.type()).isEqualTo("EXPENSE");
-		assertThat(result.parentCategoryId()).isEqualTo(parentId);
-	}
-
-	@Test
-	void toResponse_returnsNullForNull() {
-		assertThat(mapper.toResponse(null)).isNull();
-	}
-
-	@Test
-	void toResponse_handlesNullType() {
-		Category domain = Category.builder().name("Minimal").build();
-
-		CategoryResponse result = mapper.toResponse(domain);
-
-		assertThat(result.type()).isNull();
 	}
 
 }

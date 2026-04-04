@@ -41,4 +41,23 @@ public class RecurringTransaction extends BaseDomainModel {
 
 	private RecurringTransactionStatus status;
 
+	public void togglePause() {
+		this.status = (this.status == RecurringTransactionStatus.ACTIVE)
+				? RecurringTransactionStatus.PAUSED
+				: RecurringTransactionStatus.ACTIVE;
+	}
+
+	public void applyDefaults() {
+		if (this.status == null) {
+			this.status = RecurringTransactionStatus.ACTIVE;
+		}
+		if (this.autoConfirm == null) {
+			this.autoConfirm = true;
+		}
+	}
+
+	public void cancel() {
+		this.status = RecurringTransactionStatus.CANCELLED;
+	}
+
 }

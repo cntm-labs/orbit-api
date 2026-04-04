@@ -51,6 +51,22 @@ class UpdateRecurringTransactionServiceTest {
 	}
 
 	@Test
+	void update_setsAllFields() {
+		RecurringTransaction recurring = buildRecurring();
+		UUID id = recurring.getId();
+		UUID newCategoryId = UUID.randomUUID();
+
+		when(repositoryPort.findById(id)).thenReturn(Optional.of(recurring));
+		when(repositoryPort.save(any(RecurringTransaction.class))).thenAnswer(inv -> inv.getArgument(0));
+
+		RecurringTransaction result = service.update(id, "New desc", new BigDecimal("250.00"), newCategoryId);
+
+		assertThat(result.getDescription()).isEqualTo("New desc");
+		assertThat(result.getAmount()).isEqualByComparingTo(new BigDecimal("250.00"));
+		assertThat(result.getCategoryId()).isEqualTo(newCategoryId);
+	}
+
+	@Test
 	void update_throwsWhenNotFound() {
 		UUID id = UUID.randomUUID();
 

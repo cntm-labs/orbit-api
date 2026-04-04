@@ -43,6 +43,22 @@ class UpdateSubscriptionServiceTest {
 	}
 
 	@Test
+	void update_setsAllFields() {
+		UUID id = UUID.randomUUID();
+		Subscription sub = Subscription.builder().id(id).name("Netflix").amount(new BigDecimal("15.99"))
+				.reminderDaysBefore(3).build();
+
+		when(repositoryPort.findById(id)).thenReturn(Optional.of(sub));
+		when(repositoryPort.save(any(Subscription.class))).thenAnswer(inv -> inv.getArgument(0));
+
+		Subscription result = updateSubscriptionService.update(id, "Spotify", new BigDecimal("9.99"), 7);
+
+		assertThat(result.getName()).isEqualTo("Spotify");
+		assertThat(result.getAmount()).isEqualByComparingTo(new BigDecimal("9.99"));
+		assertThat(result.getReminderDaysBefore()).isEqualTo(7);
+	}
+
+	@Test
 	void togglePause_activeToPaused() {
 		UUID id = UUID.randomUUID();
 		Subscription sub = Subscription.builder().id(id).name("Netflix").status(SubscriptionStatus.ACTIVE).build();

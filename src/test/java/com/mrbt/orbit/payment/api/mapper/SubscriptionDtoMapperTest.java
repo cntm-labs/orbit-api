@@ -88,8 +88,8 @@ class SubscriptionDtoMapperTest {
 	}
 
 	@Test
-	void toResponseList_returnsNullForNull() {
-		assertThat(mapper.toResponseList(null)).isNull();
+	void toResponseList_returnsEmptyListForNull() {
+		assertThat(mapper.toResponseList(null)).isEmpty();
 	}
 
 }

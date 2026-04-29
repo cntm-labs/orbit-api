@@ -2,7 +2,6 @@ package com.mrbt.orbit.ledger.core.service;
 
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.ledger.core.model.Transaction;
-import com.mrbt.orbit.ledger.core.model.enums.TransactionStatus;
 import com.mrbt.orbit.ledger.core.port.in.DeleteTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.in.UpdateTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.out.AccountRepositoryPort;
@@ -42,10 +41,10 @@ public class UpdateTransactionService implements UpdateTransactionUseCase, Delet
 	public void voidTransaction(UUID transactionId) {
 		Transaction tx = transactionRepositoryPort.findById(transactionId)
 				.orElseThrow(() -> new ResourceNotFoundException("Transaction", "ID", transactionId));
-		if (tx.getStatus() == TransactionStatus.COMPLETED) {
+		if (tx.isCompleted()) {
 			accountRepositoryPort.updateBalance(tx.getAccountId(), tx.getAmount().negate());
 		}
-		tx.setStatus(TransactionStatus.VOIDED);
+		tx.voidTransaction();
 		transactionRepositoryPort.save(tx);
 	}
 }

@@ -3,7 +3,6 @@ package com.mrbt.orbit.ledger.core.service;
 import com.mrbt.orbit.common.exception.BadRequestException;
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.ledger.core.model.Transaction;
-import com.mrbt.orbit.ledger.core.model.enums.TransactionStatus;
 import com.mrbt.orbit.ledger.core.model.TransactionCreatedEvent;
 import com.mrbt.orbit.ledger.core.port.in.CreateTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.out.AccountRepositoryPort;
@@ -13,7 +12,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 
 @Service
@@ -32,35 +30,25 @@ public class CreateTransactionService implements CreateTransactionUseCase {
 				.orElseThrow(() -> new ResourceNotFoundException("Account", "ID", transaction.getAccountId()));
 
 		// 2. Set defaults
-		if (transaction.getStatus() == null) {
-			transaction.setStatus(TransactionStatus.COMPLETED);
-		}
+		transaction.applyDefaults();
 		if (transaction.getTransactionDate() == null) {
 			transaction.setTransactionDate(Instant.now());
 		}
-		if (transaction.getIsReviewed() == null) {
-			transaction.setIsReviewed(false);
-		}
-		if (transaction.getExchangeRate() == null) {
-			transaction.setExchangeRate(BigDecimal.ONE);
-		}
 
 		// 3. Prevent 0 amount transactions (meaningless in ledger)
-		if (transaction.getAmount().compareTo(BigDecimal.ZERO) == 0) {
+		if (!transaction.isValidAmount()) {
 			throw new BadRequestException("Transaction amount cannot be exactly zero.");
 		}
 
 		// 4. If transaction is COMPLETED, update the account balance
-		// Positive amount = Income (increases balance)
-		// Negative amount = Expense (decreases balance)
-		if (transaction.getStatus() == TransactionStatus.COMPLETED) {
+		if (transaction.isCompleted()) {
 			accountRepositoryPort.updateBalance(transaction.getAccountId(), transaction.getAmount());
 		}
 
 		// 5. Save the transaction log
 		Transaction saved = transactionRepositoryPort.save(transaction);
 
-		if (saved.getCategoryId() != null && saved.getStatus() == TransactionStatus.COMPLETED) {
+		if (saved.getCategoryId() != null && saved.isCompleted()) {
 			eventPublisher.publishEvent(
 					new TransactionCreatedEvent(saved.getCategoryId(), saved.getAmount(), saved.getTransactionDate()));
 		}

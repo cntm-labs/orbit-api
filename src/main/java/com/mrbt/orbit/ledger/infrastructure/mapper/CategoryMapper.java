@@ -43,15 +43,4 @@ public class CategoryMapper {
 		return entity;
 	}
 
-	public com.mrbt.orbit.ledger.api.response.CategoryResponse toResponse(Category domain) {
-		if (domain == null)
-			return null;
-
-		return com.mrbt.orbit.ledger.api.response.CategoryResponse.builder().id(domain.getId())
-				.userId(domain.getUserId()).name(domain.getName())
-				.type(domain.getType() != null ? domain.getType().name() : null).icon(domain.getIcon())
-				.color(domain.getColor()).status(domain.getStatus() != null ? domain.getStatus().name() : null)
-				.isSystem(domain.getIsSystem()).parentCategoryId(domain.getParentCategoryId())
-				.createdAt(domain.getCreatedAt()).updatedAt(domain.getUpdatedAt()).build();
-	}
 }

@@ -31,4 +31,13 @@ public class PaymentMethod extends BaseDomainModel {
 
 	private PaymentMethodStatus status;
 
+	public void applyDefaults() {
+		if (this.status == null) {
+			this.status = PaymentMethodStatus.ACTIVE;
+		}
+		if (this.isDefault == null) {
+			this.isDefault = false;
+		}
+	}
+
 }

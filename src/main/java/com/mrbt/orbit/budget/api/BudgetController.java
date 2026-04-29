@@ -10,7 +10,7 @@ import com.mrbt.orbit.budget.core.port.in.CreateBudgetUseCase;
 import com.mrbt.orbit.budget.core.port.in.GetBudgetUseCase;
 import com.mrbt.orbit.budget.core.port.in.UpdateBudgetUseCase;
 import com.mrbt.orbit.common.api.ApiResponse;
-import com.mrbt.orbit.common.api.PaginationParams;
+import com.mrbt.orbit.common.api.PaginationHelper;
 import com.mrbt.orbit.common.core.model.PageResult;
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,11 +56,8 @@ public class BudgetController {
 	@Operation(summary = "Get budgets for a user", description = "Returns paginated budgets for a user")
 	public ResponseEntity<ApiResponse<PageResult<BudgetResponse>>> getBudgetsByUserId(@PathVariable UUID userId,
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
-		PaginationParams pagination = PaginationParams.of(page, size);
-		PageResult<Budget> result = getBudgetUseCase.getBudgetsByUserId(userId, pagination.page(), pagination.size());
-		PageResult<BudgetResponse> responses = new PageResult<>(dtoMapper.toResponseList(result.content()),
-				result.totalElements(), result.totalPages(), result.page(), result.size());
-		return ResponseEntity.ok(ApiResponse.success(responses));
+		return PaginationHelper.paginated(page, size, (p, s) -> getBudgetUseCase.getBudgetsByUserId(userId, p, s),
+				dtoMapper::toResponseList);
 	}
 
 	@PatchMapping("/{budgetId}/archive")

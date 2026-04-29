@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mrbt.orbit.common.api.ApiResponse;
-import com.mrbt.orbit.common.api.PaginationParams;
+import com.mrbt.orbit.common.api.PaginationHelper;
 import com.mrbt.orbit.common.core.model.PageResult;
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.payment.api.mapper.PaymentMethodDtoMapper;
@@ -71,12 +71,8 @@ public class PaymentMethodController {
 	@Operation(summary = "Get payment methods for a user", description = "Retrieves paginated payment methods belonging to a specific user")
 	public ResponseEntity<ApiResponse<PageResult<PaymentMethodResponse>>> getByUserId(@PathVariable UUID userId,
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
-		PaginationParams pagination = PaginationParams.of(page, size);
-		PageResult<PaymentMethod> result = getPaymentMethodUseCase.findByUserId(userId, pagination.page(),
-				pagination.size());
-		PageResult<PaymentMethodResponse> responses = new PageResult<>(dtoMapper.toResponseList(result.content()),
-				result.totalElements(), result.totalPages(), result.page(), result.size());
-		return ResponseEntity.ok(ApiResponse.success(responses));
+		return PaginationHelper.paginated(page, size, (p, s) -> getPaymentMethodUseCase.findByUserId(userId, p, s),
+				dtoMapper::toResponseList);
 	}
 
 	@PatchMapping("/{id}")

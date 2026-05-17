@@ -18,7 +18,7 @@ public interface AccountRepository extends JpaRepository<AccountEntity, UUID> {
 	boolean existsByUserIdAndName(UUID userId, String name);
 
 	@Modifying
-	@Query("UPDATE AccountEntity a SET a.currentBalance = a.currentBalance + :amount WHERE a.id = :id")
+	@Query("UPDATE AccountEntity a SET a.currentBalance = a.currentBalance + :amount, a.version = a.version + 1 WHERE a.id = :id")
 	int updateBalanceAtomically(@Param("id") UUID id, @Param("amount") BigDecimal amount);
 
 }

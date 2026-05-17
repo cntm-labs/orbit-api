@@ -16,6 +16,7 @@ import lombok.experimental.SuperBuilder;
 public class User extends BaseDomainModel {
 	private String clerkUserId;
 	private String email;
+	private String password;
 	private String firstName;
 	private String lastName;
 	private String baseCurrency;

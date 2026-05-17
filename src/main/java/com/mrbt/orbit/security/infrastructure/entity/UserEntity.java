@@ -28,8 +28,10 @@ public class UserEntity extends SoftDeletableEntity {
 	@Column(unique = true)
 	private String clerkUserId;
 
-	@Column(unique = true)
+	@Column(unique = true, nullable = false)
 	private String email;
+
+	private String password;
 
 	private String firstName;
 

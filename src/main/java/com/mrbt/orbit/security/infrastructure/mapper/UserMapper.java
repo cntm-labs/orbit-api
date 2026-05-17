@@ -20,8 +20,8 @@ public class UserMapper {
 			return null;
 
 		return User.builder().id(entity.getId()).clerkUserId(entity.getClerkUserId()).email(entity.getEmail())
-				.firstName(entity.getFirstName()).lastName(entity.getLastName()).baseCurrency(entity.getBaseCurrency())
-				.timezone(entity.getTimezone()).status(entity.getStatus())
+				.password(entity.getPassword()).firstName(entity.getFirstName()).lastName(entity.getLastName())
+				.baseCurrency(entity.getBaseCurrency()).timezone(entity.getTimezone()).status(entity.getStatus())
 				.createdAt(
 						entity.getCreatedAt() != null ? entity.getCreatedAt().atOffset(java.time.ZoneOffset.UTC) : null)
 				.updatedAt(
@@ -37,6 +37,7 @@ public class UserMapper {
 		entity.setId(domain.getId());
 		entity.setClerkUserId(domain.getClerkUserId());
 		entity.setEmail(domain.getEmail());
+		entity.setPassword(domain.getPassword());
 		entity.setFirstName(domain.getFirstName());
 		entity.setLastName(domain.getLastName());
 		entity.setBaseCurrency(domain.getBaseCurrency());
@@ -52,8 +53,9 @@ public class UserMapper {
 		if (request == null)
 			return null;
 
-		return User.builder().clerkUserId(request.clerkUserId()).email(request.email()).firstName(request.firstName())
-				.lastName(request.lastName()).baseCurrency(request.baseCurrency()).timezone(request.timezone()).build();
+		return User.builder().clerkUserId(request.clerkUserId()).email(request.email()).password(request.password())
+				.firstName(request.firstName()).lastName(request.lastName()).baseCurrency(request.baseCurrency())
+				.timezone(request.timezone()).build();
 	}
 
 	public UserResponse toResponse(User domain) {

@@ -68,7 +68,7 @@ class UserControllerTest {
 		});
 
 		CreateUserRequest request = CreateUserRequest.builder().clerkUserId("clerk_123").email("test@example.com")
-				.firstName("John").lastName("Doe").build();
+				.password("password123").firstName("John").lastName("Doe").build();
 
 		mockMvc.perform(post("/api/v1/users").contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request))).andExpect(status().isCreated())

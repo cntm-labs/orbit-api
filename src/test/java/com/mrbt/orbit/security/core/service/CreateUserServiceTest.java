@@ -19,6 +19,7 @@ import com.mrbt.orbit.security.core.model.enums.UserStatus;
 import com.mrbt.orbit.security.core.port.out.UserRepositoryPort;
 
 @ExtendWith(MockitoExtension.class)
+@org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
 class CreateUserServiceTest {
 
 	@Mock

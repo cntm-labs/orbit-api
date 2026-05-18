@@ -1,15 +1,19 @@
 package com.mrbt.orbit.ledger.core.service;
 
+import java.math.BigDecimal;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.mrbt.orbit.audit.core.annotation.Auditable;
+import com.mrbt.orbit.audit.core.model.enums.AuditAction;
 import com.mrbt.orbit.common.exception.DuplicateResourceException;
 import com.mrbt.orbit.ledger.core.model.Account;
 import com.mrbt.orbit.ledger.core.model.enums.AccountStatus;
 import com.mrbt.orbit.ledger.core.port.in.CreateAccountUseCase;
 import com.mrbt.orbit.ledger.core.port.out.AccountRepositoryPort;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +23,7 @@ public class CreateAccountService implements CreateAccountUseCase {
 
 	@Override
 	@Transactional
+	@Auditable(action = AuditAction.CREATE, entityType = "ACCOUNT")
 	public Account createAccount(Account account) {
 		if (accountRepositoryPort.existsByUserIdAndName(account.getUserId(), account.getName())) {
 			throw new DuplicateResourceException("Account", "Name", account.getName());

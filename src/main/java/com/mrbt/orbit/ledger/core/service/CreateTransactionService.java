@@ -1,5 +1,13 @@
 package com.mrbt.orbit.ledger.core.service;
 
+import java.time.Instant;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.mrbt.orbit.audit.core.annotation.Auditable;
+import com.mrbt.orbit.audit.core.model.enums.AuditAction;
 import com.mrbt.orbit.common.exception.BadRequestException;
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.ledger.core.model.Transaction;
@@ -7,12 +15,8 @@ import com.mrbt.orbit.ledger.core.model.TransactionCreatedEvent;
 import com.mrbt.orbit.ledger.core.port.in.CreateTransactionUseCase;
 import com.mrbt.orbit.ledger.core.port.out.AccountRepositoryPort;
 import com.mrbt.orbit.ledger.core.port.out.TransactionRepositoryPort;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +28,7 @@ public class CreateTransactionService implements CreateTransactionUseCase {
 
 	@Override
 	@Transactional
+	@Auditable(action = AuditAction.CREATE, entityType = "TRANSACTION")
 	public Transaction createTransaction(Transaction transaction) {
 		// 1. Validate associated account exists
 		accountRepositoryPort.findById(transaction.getAccountId())

@@ -1,16 +1,17 @@
 package com.mrbt.orbit.security.core.service;
 
+import java.util.UUID;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
 
 import com.mrbt.orbit.security.infrastructure.entity.UserEntity;
 import com.mrbt.orbit.security.infrastructure.repository.UserRepository;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
@@ -21,15 +22,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		UserEntity user = userRepository.findByEmail(username)
 				.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
 
-		return new InternalUserDetails(user.getEmail(), user.getPassword());
+		return new InternalUserDetails(user.getId(), user.getEmail(), user.getPassword());
 	}
 
+	@Getter
 	@RequiredArgsConstructor
 	public static class InternalUserDetails implements UserDetails {
+		private final UUID userId;
 		private final String email;
 		private final String password;
 
 		public InternalUserDetails(com.mrbt.orbit.security.core.model.User user) {
+			this.userId = user.getId();
 			this.email = user.getEmail();
 			this.password = user.getPassword();
 		}

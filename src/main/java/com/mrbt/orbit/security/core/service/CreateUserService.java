@@ -1,10 +1,13 @@
 package com.mrbt.orbit.security.core.service;
 
+import com.mrbt.orbit.audit.core.annotation.Auditable;
+import com.mrbt.orbit.audit.core.model.enums.AuditAction;
 import com.mrbt.orbit.common.exception.DuplicateResourceException;
 import com.mrbt.orbit.security.core.model.User;
 import com.mrbt.orbit.security.core.model.enums.UserStatus;
 import com.mrbt.orbit.security.core.port.in.CreateUserUseCase;
 import com.mrbt.orbit.security.core.port.out.UserRepositoryPort;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,14 +20,13 @@ public class CreateUserService implements CreateUserUseCase {
 
 	@Override
 	@Transactional
+	@Auditable(action = AuditAction.CREATE, entityType = "USER")
 	public User createUser(User user) {
-		if (userRepositoryPort.existsByClerkUserId(user.getClerkUserId())) {
-			throw new DuplicateResourceException("User", "Clerk ID", user.getClerkUserId());
-		}
 		if (userRepositoryPort.existsByEmail(user.getEmail())) {
 			throw new DuplicateResourceException("User", "Email", user.getEmail());
 		}
-		// Set default values for new users
+
+		// Default values for new users
 		if (user.getStatus() == null) {
 			user.setStatus(UserStatus.ACTIVE);
 		}

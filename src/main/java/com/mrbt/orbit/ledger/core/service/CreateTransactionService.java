@@ -1,7 +1,14 @@
 package com.mrbt.orbit.ledger.core.service;
 
+import java.time.Instant;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.mrbt.orbit.audit.core.annotation.Auditable;
 import com.mrbt.orbit.audit.core.model.enums.AuditAction;
+import com.mrbt.orbit.common.exception.BadRequestException;
 import com.mrbt.orbit.common.exception.ResourceNotFoundException;
 import com.mrbt.orbit.ledger.core.model.Transaction;
 import com.mrbt.orbit.ledger.core.model.TransactionCreatedEvent;
@@ -10,9 +17,6 @@ import com.mrbt.orbit.ledger.core.port.out.AccountRepositoryPort;
 import com.mrbt.orbit.ledger.core.port.out.TransactionRepositoryPort;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,13 +34,25 @@ public class CreateTransactionService implements CreateTransactionUseCase {
 		accountRepositoryPort.findById(transaction.getAccountId())
 				.orElseThrow(() -> new ResourceNotFoundException("Account", "ID", transaction.getAccountId()));
 
-		// 2. Perform atomic balance update in Ledger
-		accountRepositoryPort.updateBalance(transaction.getAccountId(), transaction.getAmount());
+		// 2. Set defaults
+		transaction.applyDefaults();
+		if (transaction.getTransactionDate() == null) {
+			transaction.setTransactionDate(Instant.now());
+		}
 
-		// 3. Save the transaction
+		// 3. Prevent 0 amount transactions (meaningless in ledger)
+		if (!transaction.isValidAmount()) {
+			throw new BadRequestException("Transaction amount cannot be exactly zero.");
+		}
+
+		// 4. If transaction is COMPLETED, update the account balance
+		if (transaction.isCompleted()) {
+			accountRepositoryPort.updateBalance(transaction.getAccountId(), transaction.getAmount());
+		}
+
+		// 5. Save the transaction log
 		Transaction saved = transactionRepositoryPort.save(transaction);
 
-		// 4. Publish event for cross-module sync (e.g., Budget, Audit)
 		if (saved.getCategoryId() != null && saved.isCompleted()) {
 			eventPublisher.publishEvent(
 					new TransactionCreatedEvent(saved.getCategoryId(), saved.getAmount(), saved.getTransactionDate()));

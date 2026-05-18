@@ -33,6 +33,10 @@ public class AuditAspect {
 	public void auditAction(JoinPoint joinPoint, Auditable auditable, Object result) {
 		try {
 			UUID userId = getCurrentUserId();
+			if (userId == null) {
+				log.debug("Skipping audit log: No authenticated user found.");
+				return;
+			}
 			String ipAddress = getClientIp();
 
 			UUID entityId = null;
